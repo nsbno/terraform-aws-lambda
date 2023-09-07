@@ -1,0 +1,25 @@
+= Lambda
+:!toc-title:
+:!toc-placement:
+:toc:
+
+Create serverless applications with Lambda
+
+toc::[]
+
+== About
+This module helps you set up your Lambdas with Vy best practices.
+
+== Usage
+To use this module, just add it to your terraform!
+
+// TODO: Add variables to the module example!
+[source, hcl]
+----
+module "lambda" {
+  source = "github.com/nsbno/terraform-aws-lambda?ref=x.y.z"
+
+
+}
+----
+
