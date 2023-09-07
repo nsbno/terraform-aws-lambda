@@ -38,7 +38,8 @@ variable "handler" {
 variable "environment_variables" {
   description = "Environment variables to set for the lambda function"
 
-  type = map(string)
+  type    = map(string)
+  default = {}
 }
 
 variable "memory" {

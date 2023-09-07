@@ -10,6 +10,13 @@ toc::[]
 == About
 This module helps you set up your Lambdas with Vy best practices.
 
+== Integrations
+
+This module does also have sub-modules to integrate with different AWS services.
+
+link:modules/sqs_integration[SQS]::
+Allow your lambda function to be triggered by SQS queues.
+
 == Usage
 To use this module, just add it to your terraform!
 
@@ -29,4 +36,11 @@ module "lambda" {
   memory = 256
 }
 ----
+
+== Examples
+
+These examples show you how to use this module in different configurations.
+
+link:examples/sqs[SQS]::
+This example shows a Lambda that is triggered by an SQS queue.
 
