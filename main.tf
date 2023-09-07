@@ -27,7 +27,7 @@ resource "aws_lambda_function" "this" {
   s3_object_version = var.artifact_type == "s3" ? var.artifact.version : null
   image_uri         = var.artifact_type == "ecr" ? "${var.artifact.store}/${var.artifact.path}@${var.artifact.version}" : null
 
-  timeout = 120
+  timeout = var.timeout
 
   runtime = var.artifact_type == "s3" ? var.runtime : null
   handler = var.handler

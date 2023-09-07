@@ -35,6 +35,13 @@ variable "handler" {
   type = string
 }
 
+variable "timeout" {
+  description = "Max runtime in seconds for the lambda function"
+
+  type    = number
+  default = 120
+}
+
 variable "environment_variables" {
   description = "Environment variables to set for the lambda function"
 
