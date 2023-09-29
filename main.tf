@@ -20,7 +20,7 @@ resource "aws_iam_role" "this" {
 resource "aws_lambda_function" "this" {
   function_name = var.name
 
-  package_type = var.artifact_type
+  package_type = var.artifact_type == "s3" ? "Zip" : "Image"
 
   s3_bucket         = var.artifact_type == "s3" ? var.artifact.store : null
   s3_key            = var.artifact_type == "s3" ? var.artifact.path : null
