@@ -64,5 +64,5 @@ data "aws_iam_policy_document" "allow_logging" {
 
 resource "aws_iam_role_policy" "allow_logging" {
   role   = aws_iam_role.this.id
-  policy = data.aws_iam_policy_document.assume_role_policy.json
+  policy = data.aws_iam_policy_document.allow_logging.json
 }
