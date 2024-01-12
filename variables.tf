@@ -57,7 +57,7 @@ variable "memory" {
 }
 
 variable "layers" {
-  description = "List of Lambda Layer Version ARNs (maximum of 5) to attach to your Lambda Function"
+  description = "List of lambda layer version ARNs (maximum of 5) to attach to your lambda function"
 
   type    = list(string)
   default = []
