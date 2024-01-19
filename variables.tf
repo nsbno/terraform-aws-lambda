@@ -62,3 +62,17 @@ variable "layers" {
   type    = list(string)
   default = []
 }
+
+variable "subnet_ids" {
+  description = "List of subnet IDs to place the lambda function within. Part of VPC config"
+
+  type    = list(string)
+  default = []
+}
+
+variable "security_group_ids" {
+  description = "List of security group IDs to place the lambda function within. Part of VPC config"
+
+  type    = list(string)
+  default = []
+}
