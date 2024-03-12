@@ -38,6 +38,10 @@ resource "aws_lambda_function" "this" {
 
   layers = var.layers
 
+  tracing_config {
+    mode = var.x_ray_mode
+  }
+
   vpc_config {
     subnet_ids         = var.subnet_ids
     security_group_ids = var.security_group_ids
@@ -72,4 +76,24 @@ data "aws_iam_policy_document" "allow_logging" {
 resource "aws_iam_role_policy" "allow_logging" {
   role   = aws_iam_role.this.id
   policy = data.aws_iam_policy_document.allow_logging.json
+}
+
+data "aws_iam_policy_document" "allow_x_ray" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "xray:PutTraceSegments",
+      "xray:PutTelemetryRecords",
+      "xray:GetSamplingRules",
+      "xray:GetSamplingTargets",
+      "xray:GetSamplingStatisticSummaries"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "allow_tracing" {
+  role   = aws_iam_role.this.id
+  policy = data.aws_iam_policy_document.allow_x_ray.json
 }

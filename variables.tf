@@ -76,3 +76,10 @@ variable "security_group_ids" {
   type    = list(string)
   default = []
 }
+
+variable "x_ray_mode" {
+  description = "The tracing mode for AWS X-Ray"
+
+  type    = string
+  default = "PassThrough"
+}
