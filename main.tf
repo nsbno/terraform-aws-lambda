@@ -54,14 +54,6 @@ resource "aws_lambda_function" "this" {
   }
 }
 
-resource "aws_lambda_alias" "this" {
-  function_name    = aws_lambda_function.this.function_name
-  function_version = aws_lambda_function.this.version
-
-  name        = "active"
-  description = "The current active version of the function"
-}
-
 resource "aws_cloudwatch_log_group" "this" {
   name              = "/aws/lambda/${aws_lambda_function.this.function_name}"
   retention_in_days = 30
@@ -108,29 +100,20 @@ resource "aws_iam_role_policy" "allow_tracing" {
   policy = data.aws_iam_policy_document.allow_x_ray.json
 }
 
-resource "aws_lambda_provisioned_concurrency_config" "this" {
+resource "aws_appautoscaling_target" "this" {
   count = var.provisioned_concurrency_capacity != null ? 1 : 0
 
-  function_name = aws_lambda_alias.this.function_name
-  qualifier     = aws_lambda_alias.this.name
-
-  provisioned_concurrent_executions = var.provisioned_concurrency_capacity
-}
-
-resource "aws_appautoscaling_target" "this" {
-  count = var.provisioned_concurrency_scale_to_capacity != null ? 1 : 0
-
-  resource_id = "function:${aws_lambda_alias.this.function_name}:${aws_lambda_alias.this.name}"
+  resource_id = "function:${aws_lambda_function.this.function_name}:${aws_lambda_function.this.version}"
 
   service_namespace  = "lambda"
   scalable_dimension = "lambda:function:ProvisionedConcurrency"
 
   min_capacity = var.provisioned_concurrency_capacity
-  max_capacity = var.provisioned_concurrency_scale_to_capacity
+  max_capacity = var.provisioned_concurrency_scale_to_capacity == null ? var.provisioned_concurrency_capacity : var.provisioned_concurrency_scale_to_capacity
 }
 
 resource "aws_appautoscaling_policy" "this" {
-  count = var.provisioned_concurrency_scale_to_capacity != null ? 1 : 0
+  count = var.provisioned_concurrency_capacity != null ? 1 : 0
 
   name               = "ScaleOut"
   policy_type        = "TargetTrackingScaling"

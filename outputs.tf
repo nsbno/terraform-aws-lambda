@@ -1,13 +1,13 @@
 output "lambda_arn" {
-  value = aws_lambda_alias.this.arn
+  value = aws_lambda_function.this.qualified_arn
 }
 
 output "invoke_arn" {
-  value = aws_lambda_alias.this.invoke_arn
+  value = aws_lambda_function.this.qualified_invoke_arn
 }
 
 output "function_name" {
-  value = aws_lambda_alias.this.function_name
+  value = aws_lambda_function.this.function_name
 }
 
 output "role_arn" {
