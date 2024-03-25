@@ -83,3 +83,26 @@ variable "x_ray_mode" {
   type    = string
   default = "PassThrough"
 }
+
+variable "provisioned_concurrency_capacity" {
+  description = "The amount of provisioned concurrency to allocate to the lambda function"
+
+  type     = number
+  nullable = true
+  default  = null
+}
+
+variable "provisioned_concurrency_scale_to_capacity" {
+  description = "The maximum amount of provisioned concurrency to allocate to the lambda function. This activates auto-scaling."
+
+  type     = number
+  nullable = true
+  default  = null
+}
+
+variable "provisioned_concurrency_target_utilization" {
+  description = "The target utilization percentage of the provisioned concurrency"
+
+  type    = number
+  default = 0.7
+}
