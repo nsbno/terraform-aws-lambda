@@ -38,6 +38,8 @@ resource "aws_lambda_function" "this" {
 
   layers = var.layers
 
+  publish = true
+
   tracing_config {
     mode = var.x_ray_mode
   }
@@ -50,6 +52,14 @@ resource "aws_lambda_function" "this" {
   environment {
     variables = var.environment_variables
   }
+}
+
+resource "aws_lambda_alias" "this" {
+  function_name    = aws_lambda_function.this.function_name
+  function_version = aws_lambda_function.this.version
+
+  name        = "active"
+  description = "The current active version of the function"
 }
 
 resource "aws_cloudwatch_log_group" "this" {
@@ -96,4 +106,43 @@ data "aws_iam_policy_document" "allow_x_ray" {
 resource "aws_iam_role_policy" "allow_tracing" {
   role   = aws_iam_role.this.id
   policy = data.aws_iam_policy_document.allow_x_ray.json
+}
+
+resource "aws_lambda_provisioned_concurrency_config" "this" {
+  count = var.provisioned_concurrency_capacity != null ? 1 : 0
+
+  function_name = aws_lambda_alias.this.function_name
+  qualifier     = aws_lambda_alias.this.name
+
+  provisioned_concurrent_executions = var.provisioned_concurrency_capacity
+}
+
+resource "aws_appautoscaling_target" "this" {
+  count = var.provisioned_concurrency_scale_to_capacity != null ? 1 : 0
+
+  resource_id = "function:${aws_lambda_alias.this.function_name}:${aws_lambda_alias.this.name}"
+
+  service_namespace  = "lambda"
+  scalable_dimension = "lambda:function:ProvisionedConcurrency"
+
+  min_capacity = var.provisioned_concurrency_capacity
+  max_capacity = var.provisioned_concurrency_scale_to_capacity
+}
+
+resource "aws_appautoscaling_policy" "this" {
+  count = var.provisioned_concurrency_scale_to_capacity != null ? 1 : 0
+
+  name               = "ScaleOut"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.this[0].resource_id
+  scalable_dimension = aws_appautoscaling_target.this[0].scalable_dimension
+  service_namespace  = aws_appautoscaling_target.this[0].service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "LambdaProvisionedConcurrencyUtilization"
+    }
+
+    target_value = var.provisioned_concurrency_target_utilization
+  }
 }
