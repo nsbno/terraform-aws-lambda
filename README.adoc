@@ -37,6 +37,16 @@ module "lambda" {
 }
 ----
 
+== Integration Modules
+
+This module has sub-modules to make integration with other AWS services easier.
+
+link:modules/sqs_integration[SQS]::
+This module allows you to trigger your Lambda with SQS queues.
+
+link:modules/api_gw_v2_integration[API Gateway v2]::
+This module allows you to trigger your Lambda with API Gateway v2
+
 == Examples
 
 These examples show you how to use this module in different configurations.

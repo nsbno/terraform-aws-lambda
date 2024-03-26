@@ -9,6 +9,8 @@ terraform_versions: &terraform_versions
 
 terraform_folders: &terraform_folders
   - ./
+  - ./modules/sqs_integration
+  - ./modules/api_gw_v2_integration
   - ./examples/sqs
   - ./examples/provisioned_concurrency
 
