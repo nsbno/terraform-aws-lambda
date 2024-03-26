@@ -40,6 +40,14 @@ resource "aws_lambda_function" "this" {
 
   publish = true
 
+  dynamic "snap_start" {
+    for_each = var.snap_start ? [{}] : []
+
+    content {
+      apply_on = "PublishedVersions"
+    }
+  }
+
   tracing_config {
     mode = var.x_ray_mode
   }

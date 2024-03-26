@@ -84,6 +84,13 @@ variable "x_ray_mode" {
   default = "PassThrough"
 }
 
+variable "snap_start" {
+  description = "Enable or disable snap start for the lambda function"
+
+  type    = bool
+  default = false
+}
+
 variable "provisioned_concurrency" {
   description = "Settings for provisioned concurrency"
 
