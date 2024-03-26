@@ -102,6 +102,13 @@ variable "provisioned_concurrency" {
     target_utilization = optional(number, 0.8)
     scale_in_cooldown  = optional(number, 600)
     scale_out_cooldown = optional(number, 120)
+    schedules = optional(list(object({
+      timezone = string
+      schedule = string
+
+      minimum_capacity = optional(number, null)
+      maximum_capacity = optional(number, null)
+    })))
   })
 
   default = null

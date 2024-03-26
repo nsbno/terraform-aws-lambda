@@ -176,3 +176,23 @@ resource "aws_appautoscaling_policy" "this" {
     }
   }
 }
+
+resource "aws_appautoscaling_scheduled_action" "this" {
+  for_each = {
+    for v in var.provisioned_concurrency.schedules : v.schedule => v
+    if var.provisioned_concurrency != null
+  }
+
+  name               = "${var.name}-lambda-scheduled-scaling"
+  resource_id        = aws_appautoscaling_target.this[0].resource_id
+  scalable_dimension = aws_appautoscaling_target.this[0].scalable_dimension
+  service_namespace  = aws_appautoscaling_target.this[0].service_namespace
+
+  timezone = each.value.timezone
+  schedule = each.value.schedule
+
+  scalable_target_action {
+    min_capacity = each.value.min_capacity
+    max_capacity = each.value.max_capacity
+  }
+}
