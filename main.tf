@@ -139,7 +139,6 @@ resource "aws_appautoscaling_policy" "this" {
 
         metric_stat {
           stat = "Average"
-          unit = "Percent"
 
           metric {
             metric_name = "ProvisionedConcurrencyUtilization"
@@ -148,6 +147,11 @@ resource "aws_appautoscaling_policy" "this" {
             dimensions {
               name  = "FunctionName"
               value = aws_lambda_function.this.function_name
+            }
+
+            dimensions {
+              name  = "Resource"
+              value = "${aws_lambda_function.this.function_name}:${aws_lambda_function.this.version}"
             }
           }
         }
