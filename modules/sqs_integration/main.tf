@@ -1,5 +1,5 @@
 resource "aws_lambda_event_source_mapping" "receive_amount_of_developers" {
-  function_name           = var.lambda_arn
+  function_name           = var.lambda.lambda_arn
   event_source_arn        = var.queue_arn
   function_response_types = ["ReportBatchItemFailures"]
 }
@@ -21,6 +21,6 @@ data "aws_iam_policy_document" "this" {
 }
 
 resource "aws_iam_role_policy" "this" {
-  role   = var.lambda_role_arn
+  role   = var.lambda.role_arn
   policy = data.aws_iam_policy_document.this.json
 }

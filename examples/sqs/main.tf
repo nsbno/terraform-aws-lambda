@@ -25,8 +25,18 @@ module "request_queue" {
 module "sqs_integration" {
   source = "../../modules/sqs_integration"
 
-  lambda_arn      = module.lambda.lambda_arn
-  lambda_role_arn = module.lambda.role_arn
+  lambda = module.lambda
 
   queue_arn = module.request_queue.queue_arn
+}
+
+module "api_gateway" {
+  source = "../../modules/api_gw_v2_integration"
+
+  lambda                 = module.lambda
+
+  payload_format_version = "2.0"
+
+  api_execution_arn      = local.api_execution_arn
+  api_id                 = local.api_id
 }
