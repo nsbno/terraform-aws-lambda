@@ -62,6 +62,13 @@ resource "aws_lambda_function" "this" {
   }
 }
 
+resource "aws_lambda_alias" "this" {
+  name             = "active"
+
+  function_name    = aws_lambda_function.this.function_name
+  function_version = aws_lambda_function.this.version
+}
+
 resource "aws_cloudwatch_log_group" "this" {
   name              = "/aws/lambda/${aws_lambda_function.this.function_name}"
   retention_in_days = 30
@@ -111,7 +118,7 @@ resource "aws_iam_role_policy" "allow_tracing" {
 resource "aws_appautoscaling_target" "this" {
   count = var.provisioned_concurrency != null ? 1 : 0
 
-  resource_id = "function:${aws_lambda_function.this.function_name}:${aws_lambda_function.this.version}"
+  resource_id = "function:${aws_lambda_alias.this.function_name}:${aws_lambda_alias.this.name}"
 
   service_namespace  = "lambda"
   scalable_dimension = "lambda:function:ProvisionedConcurrency"
@@ -123,7 +130,7 @@ resource "aws_appautoscaling_target" "this" {
 resource "aws_appautoscaling_policy" "this" {
   count = var.provisioned_concurrency != null ? 1 : 0
 
-  name        = "ScaleOut"
+  name        = "${var.name}-lambda-auto-scaling"
   policy_type = "TargetTrackingScaling"
 
   resource_id        = aws_appautoscaling_target.this[0].resource_id
