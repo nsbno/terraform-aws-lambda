@@ -199,7 +199,7 @@ resource "aws_appautoscaling_scheduled_action" "this" {
   schedule = each.value.schedule
 
   scalable_target_action {
-    min_capacity = each.value.min_capacity
-    max_capacity = each.value.max_capacity
+    min_capacity = each.value.minimum_capacity
+    max_capacity = each.value.maximum_capacity
   }
 }

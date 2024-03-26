@@ -37,6 +37,8 @@ module "lambda" {
 }
 ----
 
+IMPORTANT: This module uses lambda aliases. Remember to use the qualifier whenever you explicitly use the function name!
+
 == Integration Modules
 
 This module has sub-modules to make integration with other AWS services easier.
