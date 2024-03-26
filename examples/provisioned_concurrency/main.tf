@@ -15,6 +15,16 @@ module "lambda" {
 
   provisioned_concurrency = {
     minimum_capacity = 0
-    maximum_capacity = 6
+    maximum_capacity = 4
+
+    schedules = [
+      # Always have capacity during work hours
+      {
+        timezone     = "Europe/Oslo"
+        schedule     = "cron(* 6-18 ? * MON-FRI *)"
+
+        minimum_capacity = 1
+      },
+    ]
   }
 }
