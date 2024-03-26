@@ -88,7 +88,8 @@ variable "provisioned_concurrency" {
   description = "Settings for provisioned concurrency"
 
   nullable = true
-  type     = object({
+
+  type = object({
     minimum_capacity   = number
     maximum_capacity   = number
     target_utilization = optional(number, 0.8)

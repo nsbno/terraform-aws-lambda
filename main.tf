@@ -115,8 +115,8 @@ resource "aws_appautoscaling_target" "this" {
 resource "aws_appautoscaling_policy" "this" {
   count = var.provisioned_concurrency != null ? 1 : 0
 
-  name               = "ScaleOut"
-  policy_type        = "TargetTrackingScaling"
+  name        = "ScaleOut"
+  policy_type = "TargetTrackingScaling"
 
   resource_id        = aws_appautoscaling_target.this[0].resource_id
   scalable_dimension = aws_appautoscaling_target.this[0].scalable_dimension
@@ -155,7 +155,7 @@ resource "aws_appautoscaling_policy" "this" {
 
       metrics {
         label = "Provisioned Concurrency Utilization with missing values"
-        id = "e1"
+        id    = "e1"
 
         expression = "FILL(m1, 0)"
 

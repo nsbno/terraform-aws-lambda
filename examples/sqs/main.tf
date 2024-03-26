@@ -15,7 +15,7 @@ module "lambda" {
 }
 
 module "request_queue" {
-  source = "github.com/nsbno/terraform-aws-queue?ref=0.0.1"
+  source = "github.com/nsbno/terraform-aws-queue?ref=0.0.5"
 
   name = "get-users"
 
