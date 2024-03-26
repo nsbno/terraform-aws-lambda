@@ -101,31 +101,66 @@ resource "aws_iam_role_policy" "allow_tracing" {
 }
 
 resource "aws_appautoscaling_target" "this" {
-  count = var.provisioned_concurrency_capacity != null ? 1 : 0
+  count = var.provisioned_concurrency != null ? 1 : 0
 
   resource_id = "function:${aws_lambda_function.this.function_name}:${aws_lambda_function.this.version}"
 
   service_namespace  = "lambda"
   scalable_dimension = "lambda:function:ProvisionedConcurrency"
 
-  min_capacity = var.provisioned_concurrency_capacity
-  max_capacity = var.provisioned_concurrency_scale_to_capacity == null ? var.provisioned_concurrency_capacity : var.provisioned_concurrency_scale_to_capacity
+  min_capacity = var.provisioned_concurrency.minimum_capacity
+  max_capacity = var.provisioned_concurrency.maximum_capacity
 }
 
 resource "aws_appautoscaling_policy" "this" {
-  count = var.provisioned_concurrency_capacity != null ? 1 : 0
+  count = var.provisioned_concurrency != null ? 1 : 0
 
   name               = "ScaleOut"
   policy_type        = "TargetTrackingScaling"
+
   resource_id        = aws_appautoscaling_target.this[0].resource_id
   scalable_dimension = aws_appautoscaling_target.this[0].scalable_dimension
   service_namespace  = aws_appautoscaling_target.this[0].service_namespace
 
   target_tracking_scaling_policy_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "LambdaProvisionedConcurrencyUtilization"
-    }
+    target_value = var.provisioned_concurrency.target_utilization
 
-    target_value = var.provisioned_concurrency_target_utilization
+    scale_in_cooldown  = var.provisioned_concurrency.scale_in_cooldown
+    scale_out_cooldown = var.provisioned_concurrency.scale_out_cooldown
+
+    # A custom metric specification using LambdaProvisionedConcurrencyUtilization
+    # that fills in missing data as zero
+    customized_metric_specification {
+      metrics {
+        label = "Provisioned Concurrency Utilization"
+        id    = "m1"
+
+        return_data = false
+
+        metric_stat {
+          stat = "Average"
+          unit = "Percent"
+
+          metric {
+            metric_name = "ProvisionedConcurrencyUtilization"
+            namespace   = "AWS/Lambda"
+
+            dimensions {
+              name  = "FunctionName"
+              value = aws_lambda_function.this.function_name
+            }
+          }
+        }
+      }
+
+      metrics {
+        label = "Provisioned Concurrency Utilization with missing values"
+        id = "e1"
+
+        expression = "FILL(m1, 0)"
+
+        return_data = true
+      }
+    }
   }
 }

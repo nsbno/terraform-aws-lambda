@@ -44,3 +44,5 @@ These examples show you how to use this module in different configurations.
 link:examples/sqs[SQS]::
 This example shows a Lambda that is triggered by an SQS queue.
 
+link:examples/provisioned_concurrency[provisioned_concurrency]::
+An example with autoscaling provisioned concurrency.
