@@ -12,9 +12,9 @@ variable "lambda" {
 }
 
 variable "payload_format_version" {
-    description = "The version of the API Gateway payload format"
+  description = "The version of the API Gateway payload format"
 
-    type = string
+  type = string
 }
 
 variable "api_id" {

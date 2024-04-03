@@ -63,7 +63,7 @@ resource "aws_lambda_function" "this" {
 }
 
 resource "aws_lambda_alias" "this" {
-  name             = "active"
+  name = "active"
 
   function_name    = aws_lambda_function.this.function_name
   function_version = aws_lambda_function.this.version

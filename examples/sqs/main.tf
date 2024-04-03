@@ -33,10 +33,10 @@ module "sqs_integration" {
 module "api_gateway" {
   source = "../../modules/api_gw_v2_integration"
 
-  lambda                 = module.lambda
+  lambda = module.lambda
 
   payload_format_version = "2.0"
 
-  api_execution_arn      = local.api_execution_arn
-  api_id                 = local.api_id
+  api_execution_arn = "<API Execution ARN>"
+  api_id            = "<API ID>"
 }

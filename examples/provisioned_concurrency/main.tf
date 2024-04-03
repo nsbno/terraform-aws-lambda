@@ -20,8 +20,8 @@ module "lambda" {
     schedules = [
       # Always have capacity during work hours
       {
-        timezone     = "Europe/Oslo"
-        schedule     = "cron(* 6-18 ? * MON-FRI *)"
+        timezone = "Europe/Oslo"
+        schedule = "cron(* 6-18 ? * MON-FRI *)"
 
         minimum_capacity = 1
       },

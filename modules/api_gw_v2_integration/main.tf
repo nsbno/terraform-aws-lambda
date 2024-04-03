@@ -9,10 +9,10 @@ resource "aws_apigatewayv2_integration" "this" {
 }
 
 resource "aws_lambda_permission" "this" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id = "AllowExecutionFromAPIGateway"
 
-  action        = "lambda:InvokeFunction"
-  principal     = "apigateway.amazonaws.com"
+  action    = "lambda:InvokeFunction"
+  principal = "apigateway.amazonaws.com"
 
   function_name = var.lambda.function_name
   qualifier     = var.lambda.function_qualifier
