@@ -185,10 +185,9 @@ resource "aws_appautoscaling_policy" "this" {
 }
 
 resource "aws_appautoscaling_scheduled_action" "this" {
-  for_each = {
+  for_each = var.provisioned_concurrency != null ? {
     for v in var.provisioned_concurrency.schedules : v.schedule => v
-    if var.provisioned_concurrency != null
-  }
+  } : {}
 
   name               = "${var.name}-lambda-scheduled-scaling"
   resource_id        = aws_appautoscaling_target.this[0].resource_id
