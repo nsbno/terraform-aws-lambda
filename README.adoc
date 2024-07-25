@@ -21,7 +21,7 @@ This module allows you to trigger your Lambda with API Gateway v2
 == Usage
 Remember to check out the link:variables.tf[*variables*] and link:outputs.tf[*outputs*] to see all options.
 
-IMPORTANT: This module uses lambda aliases. Remember to use the `function_qualifier` instead of using the `function_name`!
+IMPORTANT: This module uses lambda aliases. Remember to use the `function_qualifier` instead of using the `function_name` to reference the lambda!
 
 [source, hcl]
 ----
