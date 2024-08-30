@@ -97,6 +97,17 @@ data "aws_iam_policy_document" "secrets_manager" {
       data.aws_secretsmanager_secret.datadog_api_key.arn
     ]
   }
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt"
+    ]
+
+    resources = [
+      "arn:aws:kms:eu-west-1:727646359971:key/1bfdf87f-a69c-41f8-929a-2a491fc64f69"
+    ]
+  }
 }
 
 resource "aws_iam_role_policy" "secrets_manager" {
