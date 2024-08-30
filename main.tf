@@ -84,7 +84,7 @@ locals {
 }
 
 module "account_metadata" {
-  source = "github.com/nsbno/terraform-aws-account-metadata?ref=0.1.1"
+  source = "github.com/nsbno/terraform-aws-account-metadata?ref=0.1.2"
 }
 
 data "aws_secretsmanager_secret" "datadog_api_key" {
