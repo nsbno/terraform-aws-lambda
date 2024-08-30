@@ -90,7 +90,6 @@ data "aws_iam_policy_document" "secrets_manager" {
     effect = "Allow"
 
     actions = [
-      "secretsmanager:DescribeSecret",
       "secretsmanager:GetSecretValue",
     ]
 
@@ -170,7 +169,7 @@ resource "aws_lambda_function" "this" {
   }
 
   environment {
-    variables = var.environment_variables
+    variables = merge(var.environment_variables, local.environment_variables.common, local.environment_variables.runtime)
   }
 }
 
