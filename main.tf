@@ -90,6 +90,7 @@ data "aws_iam_policy_document" "secrets_manager" {
     effect = "Allow"
 
     actions = [
+      "secretsmanager:DescribeSecret",
       "secretsmanager:GetSecretValue",
     ]
 
@@ -143,10 +144,11 @@ resource "aws_lambda_function" "this" {
 
   role = aws_iam_role.this.arn
 
-  layers = concat(var.layers, [
+  layers = concat(
     local.layers.extension,
-    local.layers.lambda
-  ])
+    local.layers.lambda,
+    var.layers
+  )
 
   publish = true
 
