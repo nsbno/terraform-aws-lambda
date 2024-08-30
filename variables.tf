@@ -29,6 +29,13 @@ variable "runtime" {
   type = string
 }
 
+variable "architectures" {
+  description = "The architectures to use for the lambda function"
+
+  type    = list(string)
+  default = ["x86_64"]
+}
+
 variable "handler" {
   description = "The handler to use for the lambda function"
 
@@ -112,4 +119,30 @@ variable "provisioned_concurrency" {
   })
 
   default = null
+}
+
+# DATADOG
+
+variable "datadog_extension_layer_version" {
+  description = "Version for the Datadog Extension Layer"
+  type        = number
+  default     = 63
+}
+
+variable "datadog_java_layer_version" {
+  description = "Version for the Datadog Java Layer"
+  type        = number
+  default     = 15
+}
+
+variable "datadog_node_layer_version" {
+  description = "Version for the Datadog Node Layer"
+  type        = number
+  default     = 115
+}
+
+variable "datadog_python_layer_version" {
+  description = "Version for the Datadog Python Layer"
+  type        = number
+  default     = 98
 }
