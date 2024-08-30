@@ -60,17 +60,19 @@ locals {
 
   environment_variables = {
     common = {
-      DD_CAPTURE_LAMBDA_PAYLOAD  = "false"
-      DD_LOGS_INJECTION          = "false"
-      DD_MERGE_XRAY_TRACES       = "false"
-      DD_SERVERLESS_LOGS_ENABLED = "true"
-      DD_EXTENSION_VERSION       = "next"
-      DD_SERVICE                 = var.name
-      DD_ENV                     = module.account_metadata.account.environment
-      DD_VERSION                 = var.artifact.version
-      DD_API_KEY_SECRET_ARN      = data.aws_secretsmanager_secret.datadog_api_key.arn
-      DD_SITE                    = "datadoghq.eu"
-      DD_TRACE_ENABLED           = "true"
+      DD_CAPTURE_LAMBDA_PAYLOAD       = "false"
+      DD_LOGS_INJECTION               = "false"
+      DD_MERGE_XRAY_TRACES            = "false"
+      DD_SERVERLESS_LOGS_ENABLED      = "true"
+      DD_LOGS_CONFIG_PROCESSING_RULES = [{ "type" : "exclude_at_match", "name" : "exclude_start_and_end_logs", "pattern" : "(START|END) RequestId" }]
+      DD_PROFILING_ENABLED            = "true"
+      DD_EXTENSION_VERSION            = "next"
+      DD_SERVICE                      = var.name
+      DD_ENV                          = module.account_metadata.account.environment
+      DD_VERSION                      = var.artifact.version
+      DD_API_KEY_SECRET_ARN           = data.aws_secretsmanager_secret.datadog_api_key.arn
+      DD_SITE                         = "datadoghq.eu"
+      DD_TRACE_ENABLED                = "true"
     }
     runtime = lookup(local.runtime_base_environment_variable_map, local.runtime_base, {})
   }
