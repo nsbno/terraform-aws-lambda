@@ -66,6 +66,8 @@ locals {
       DD_SERVERLESS_LOGS_ENABLED = "true"
       DD_EXTENSION_VERSION       = "next"
       DD_SERVICE                 = var.name
+      DD_ENV                     = module.account_metadata.account.environment
+      DD_VERSION                 = var.artifact.version
       DD_API_KEY_SECRET_ARN      = data.aws_secretsmanager_secret.datadog_api_key.arn
       DD_SITE                    = "datadoghq.eu"
       DD_TRACE_ENABLED           = "true"
@@ -79,6 +81,10 @@ locals {
     extension = [local.datadog_extension_layer_arn]
     lambda    = local.datadog_lambda_layer_runtime == "" ? [] : [local.datadog_lambda_layer_arn]
   }
+}
+
+module "account_metadata" {
+  source = "github.com/nsbno/terraform-aws-account-metadata?ref=0.1.1"
 }
 
 data "aws_secretsmanager_secret" "datadog_api_key" {
