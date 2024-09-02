@@ -88,7 +88,7 @@ locals {
 module "datadog_metadata" {
   source = "./modules/datadog_metadata"
 
-  team         = "Utviklerplattform"
+  team         = "utviklerplattform"
   service_name = var.dd_service_name
 
   datadog_api_key = data.aws_secretsmanager_secret_version.datadog_api_key.secret_string
