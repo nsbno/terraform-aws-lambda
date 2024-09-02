@@ -62,11 +62,12 @@ locals {
     common = {
       DD_CAPTURE_LAMBDA_PAYLOAD       = "false"
       DD_LOGS_INJECTION               = "false"
-      DD_MERGE_XRAY_TRACES            = "false"
+      DD_MERGE_XRAY_TRACES            = "true"
       DD_SERVERLESS_LOGS_ENABLED      = "true"
       DD_LOGS_CONFIG_PROCESSING_RULES = "[{ \"type\" : \"exclude_at_match\", \"name\" : \"exclude_start_and_end_logs\", \"pattern\" : \"(START|END) RequestId\" }]"
       DD_PROFILING_ENABLED            = "true"
       DD_EXTENSION_VERSION            = "next"
+      DD_TEAM                         = "utviklerplattform"
       DD_SERVICE                      = var.dd_service_name
       DD_ENV                          = module.account_metadata.account.environment
       DD_VERSION                      = var.artifact.version
