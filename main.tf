@@ -67,7 +67,7 @@ locals {
       DD_LOGS_CONFIG_PROCESSING_RULES = "[{ \"type\" : \"exclude_at_match\", \"name\" : \"exclude_start_and_end_logs\", \"pattern\" : \"(START|END) RequestId\" }]"
       DD_PROFILING_ENABLED            = "true"
       DD_EXTENSION_VERSION            = "next"
-      DD_SERVICE                      = var.name
+      DD_SERVICE                      = var.dd_service_name
       DD_ENV                          = module.account_metadata.account.environment
       DD_VERSION                      = var.artifact.version
       DD_API_KEY_SECRET_ARN           = data.aws_secretsmanager_secret.datadog_api_key.arn
@@ -83,6 +83,13 @@ locals {
     extension = [local.datadog_extension_layer_arn]
     lambda    = local.datadog_lambda_layer_runtime == "" ? [] : [local.datadog_lambda_layer_arn]
   }
+}
+
+module "datadog_metadata" {
+  source = "./modules/datadog_metadata"
+
+  team         = "Utviklerplattform"
+  service_name = var.dd_service_name
 }
 
 module "account_metadata" {

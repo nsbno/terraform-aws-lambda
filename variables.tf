@@ -4,6 +4,13 @@ variable "name" {
   type = string
 }
 
+variable "dd_service_name" {
+  description = "The name of the service. A group of function names can be part of the same service"
+
+  default = ""
+  type    = string
+}
+
 variable "artifact_type" {
   description = "The type of artifact to deploy"
 
