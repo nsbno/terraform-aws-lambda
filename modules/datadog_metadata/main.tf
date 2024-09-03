@@ -3,7 +3,7 @@ locals {
     schema-version = "v2.2"
     team           = var.team
     dd-service     = var.service_name
-    description    = var.description
+#     description    = var.description
     #     contacts = [
     #       {
     #         name = "Support Email"
@@ -16,7 +16,7 @@ locals {
     #     languages = var.languages
     #     type = var.type
     #     links = var.links
-    tags = ["team:${var.team}"]
+#     tags = ["team:${var.team}"]
   }
 }
 
