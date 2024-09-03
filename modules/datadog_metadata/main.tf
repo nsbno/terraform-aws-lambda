@@ -19,8 +19,3 @@ locals {
 #     tags = ["team:${var.team}"]
   }
 }
-
-// Service Definition with v2.2 Schema Definition
-resource "datadog_service_definition_yaml" "service_definition_v2_2" {
-  service_definition = yamlencode(local.service_definition)
-}

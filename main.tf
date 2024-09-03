@@ -66,9 +66,8 @@ locals {
       DD_SERVERLESS_LOGS_ENABLED      = "true"
       DD_LOGS_CONFIG_PROCESSING_RULES = "[{ \"type\" : \"exclude_at_match\", \"name\" : \"exclude_start_and_end_logs\", \"pattern\" : \"(START|END) RequestId\" }]"
       DD_PROFILING_ENABLED            = "true"
-      DD_TAGS                         = "team:utviklerplattform"
       DD_EXTENSION_VERSION            = "next"
-      DD_SERVICE                      = var.dd_service_name
+      DD_SERVICE                      = var.datadog_service_name == null ? var.name : var.datadog_service_name
       DD_ENV                          = module.account_metadata.account.environment
       DD_SERVICE_MAPPING              = "lambda_api_gateway:apigw_${var.name},lambda_sns:sns_${var.name},lambda_sqs:sqs_${var.name},lambda_s3:s3_${var.name},lambda_dynamodb:dynamodb_${var.name}"
       DD_VERSION                      = var.artifact.version
@@ -91,7 +90,7 @@ module "datadog_metadata" {
   source = "./modules/datadog_metadata"
 
   team         = "utviklerplattform"
-  service_name = var.dd_service_name
+  service_name = var.datadog_service_name
 
   datadog_api_key = data.aws_secretsmanager_secret_version.datadog_api_key.secret_string
   datadog_app_key = data.aws_secretsmanager_secret_version.datadog_app_key.secret_string
