@@ -66,11 +66,10 @@ locals {
       DD_SERVERLESS_LOGS_ENABLED      = "true"
       DD_LOGS_CONFIG_PROCESSING_RULES = "[{ \"type\" : \"exclude_at_match\", \"name\" : \"exclude_start_and_end_logs\", \"pattern\" : \"(START|END) RequestId\" }]"
       DD_PROFILING_ENABLED            = "true"
-      DD_TAGS                         = "team:utviklerplattform"
       DD_EXTENSION_VERSION            = "next"
-      DD_SERVICE                      = var.dd_service_name
+      DD_SERVICE                      = var.datadog_service_name == null ? var.name : var.datadog_service_name
       DD_ENV                          = module.account_metadata.account.environment
-      DD_SERVICE_MAPPING              = "lambda_api_gateway:apigw_${var.name},lambda_sns:sns_${var.name},lambda_sqs:sqs_${var.name},lambda_s3:s3_${var.name},lambda_dynamodb:dynamodb_${var.name}"
+      DD_SERVICE_MAPPING              = "lambda_api_gateway:aws.apigw.${var.name},lambda_sns:aws.sns.${var.name},lambda_sqs:aws.sqs.${var.name},lambda_s3:aws.s3.${var.name},lambda_dynamodb:aws.dynamodb.${var.name},eventbridge.custom.event.sender:aws.eventbridge.${var.name},MyStream:aws.kinesis.${var.name}"
       DD_VERSION                      = var.artifact.version
       DD_API_KEY_SECRET_ARN           = data.aws_secretsmanager_secret.datadog_api_key.arn
       DD_SITE                         = "datadoghq.eu"
@@ -87,16 +86,6 @@ locals {
   }
 }
 
-module "datadog_metadata" {
-  source = "./modules/datadog_metadata"
-
-  team         = "utviklerplattform"
-  service_name = var.dd_service_name
-
-  datadog_api_key = data.aws_secretsmanager_secret_version.datadog_api_key.secret_string
-  datadog_app_key = data.aws_secretsmanager_secret_version.datadog_app_key.secret_string
-}
-
 module "account_metadata" {
   source = "github.com/nsbno/terraform-aws-account-metadata?ref=0.1.2"
 }
@@ -109,14 +98,6 @@ data "aws_secretsmanager_secret_version" "datadog_api_key" {
   secret_id = data.aws_secretsmanager_secret.datadog_api_key.id
 }
 
-data "aws_secretsmanager_secret" "datadog_app_key" {
-  arn = "arn:aws:secretsmanager:eu-west-1:727646359971:secret:datadog_app_key-ouXsKB"
-}
-
-data "aws_secretsmanager_secret_version" "datadog_app_key" {
-  secret_id = data.aws_secretsmanager_secret.datadog_app_key.id
-}
-
 data "aws_iam_policy_document" "secrets_manager" {
   statement {
     effect = "Allow"
@@ -127,7 +108,6 @@ data "aws_iam_policy_document" "secrets_manager" {
 
     resources = [
       data.aws_secretsmanager_secret.datadog_api_key.arn,
-      data.aws_secretsmanager_secret.datadog_app_key.arn
     ]
   }
   statement {
@@ -139,7 +119,6 @@ data "aws_iam_policy_document" "secrets_manager" {
 
     resources = [
       "arn:aws:kms:eu-west-1:727646359971:key/1bfdf87f-a69c-41f8-929a-2a491fc64f69",
-      "arn:aws:kms:eu-west-1:727646359971:key/49668755-4646-46a5-aa67-681b32587e38"
     ]
   }
 }
