@@ -98,15 +98,6 @@ data "aws_secretsmanager_secret_version" "datadog_api_key" {
   secret_id = data.aws_secretsmanager_secret.datadog_api_key.id
 }
 
-data "aws_secretsmanager_secret" "datadog_app_key" {
-  arn = "arn:aws:secretsmanager:eu-west-1:727646359971:secret:datadog_app_key-ouXsKB"
-}
-
-data "aws_secretsmanager_secret_version" "datadog_app_key" {
-  secret_id = data.aws_secretsmanager_secret.datadog_app_key.id
-}
-
-
 data "aws_iam_policy_document" "secrets_manager" {
   statement {
     effect = "Allow"
@@ -117,7 +108,6 @@ data "aws_iam_policy_document" "secrets_manager" {
 
     resources = [
       data.aws_secretsmanager_secret.datadog_api_key.arn,
-      data.aws_secretsmanager_secret.datadog_app_key.arn
     ]
   }
   statement {
@@ -129,7 +119,6 @@ data "aws_iam_policy_document" "secrets_manager" {
 
     resources = [
       "arn:aws:kms:eu-west-1:727646359971:key/1bfdf87f-a69c-41f8-929a-2a491fc64f69",
-      "arn:aws:kms:eu-west-1:727646359971:key/49668755-4646-46a5-aa67-681b32587e38"
     ]
   }
 }
