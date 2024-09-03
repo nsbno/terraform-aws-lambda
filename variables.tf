@@ -4,10 +4,10 @@ variable "name" {
   type = string
 }
 
-variable "datadog_service_name" {
+variable "dd_service_name" {
   description = "The name of the service. A group of function names can be part of the same service"
 
-  default = null
+  default = ""
   type    = string
 }
 
