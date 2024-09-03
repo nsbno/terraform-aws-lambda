@@ -70,6 +70,7 @@ locals {
       DD_EXTENSION_VERSION            = "next"
       DD_SERVICE                      = var.dd_service_name
       DD_ENV                          = module.account_metadata.account.environment
+      DD_SERVICE_MAPPING              = "lambda_api_gateway:apigw_${var.name},lambda_sns:sns_${var.name},lambda_sqs:sqs_${var.name},lambda_s3:s3_${var.name},lambda_dynamodb:dynamodb_${var.name}"
       DD_VERSION                      = var.artifact.version
       DD_API_KEY_SECRET_ARN           = data.aws_secretsmanager_secret.datadog_api_key.arn
       DD_SITE                         = "datadoghq.eu"
