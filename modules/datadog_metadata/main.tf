@@ -16,7 +16,7 @@ locals {
     #     languages = var.languages
     #     type = var.type
     #     links = var.links
-    #     tags = var.tags
+    tags = ["team:${var.team}"]
   }
 }
 
