@@ -64,7 +64,7 @@ locals {
       DD_LOGS_INJECTION               = "false"
       DD_MERGE_XRAY_TRACES            = "true"
       DD_SERVERLESS_LOGS_ENABLED      = "true"
-      DD_LOGS_CONFIG_PROCESSING_RULES = "[{ \"type\" : \"exclude_at_match\", \"name\" : \"exclude_start_and_end_logs\", \"pattern\" : \"(START|END) RequestId\" }]"
+      DD_LOGS_CONFIG_PROCESSING_RULES = "[{ \"type\" : \"exclude_at_match\", \"name\" :\"exclude_start_and_end_logs\", \"pattern\" : \"(START|END|REPORT) RequestId\" }]"
       DD_PROFILING_ENABLED            = "true"
       DD_EXTENSION_VERSION            = "next"
       DD_SERVICE                      = var.datadog_service_name == null ? var.name : var.datadog_service_name
