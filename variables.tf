@@ -11,6 +11,13 @@ variable "datadog_service_name" {
   type    = string
 }
 
+variable "custom_datadog_tags" {
+  description = "Custom tags to add to the Datadog Lambda Extension. Format: `key:value,key2:value2`"
+
+  type    = string
+  default = null
+}
+
 variable "artifact_type" {
   description = "The type of artifact to deploy"
 
