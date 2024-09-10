@@ -11,6 +11,13 @@ variable "datadog_service_name" {
   type    = string
 }
 
+variable "team_name" {
+  description = "The team that owns the service"
+
+  type    = string
+  default = null
+}
+
 variable "custom_datadog_tags" {
   description = "Custom tags to add to the Datadog Lambda Extension. Format: `key:value,key2:value2`"
 

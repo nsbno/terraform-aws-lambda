@@ -58,6 +58,8 @@ locals {
   datadog_layer_name_base = "arn:aws:lambda:${data.aws_region.current.name}:${local.datadog_account_id}:layer"
   datadog_layer_suffix    = lookup(local.architecture_layer_suffix_map, var.architectures[0])
 
+  combined_tags = format("%s,team:%s", coalesce(var.custom_datadog_tags, ""), coalesce(var.team_name, ""))
+
   environment_variables = {
     common = {
       DD_CAPTURE_LAMBDA_PAYLOAD       = "false"
@@ -74,7 +76,7 @@ locals {
       DD_API_KEY_SECRET_ARN           = data.aws_secretsmanager_secret.datadog_api_key.arn
       DD_SITE                         = "datadoghq.eu"
       DD_TRACE_ENABLED                = "true"
-      DD_TAGS                         = var.custom_datadog_tags == null ? "" : var.custom_datadog_tags
+      DD_TAGS                         = local.combined_tags
     }
     runtime = lookup(local.runtime_base_environment_variable_map, local.runtime_base, {})
   }
