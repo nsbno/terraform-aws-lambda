@@ -62,6 +62,36 @@ resource "aws_lambda_function" "this" {
   }
 }
 
+data "aws_iam_policy_document" "vpc_access_permissions" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:CreateNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DescribeSubnets",
+      "ec2:DeleteNetworkInterface",
+      "ec2:AssignPrivateIpAddresses",
+      "ec2:UnassignPrivateIpAddresses"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeVpcs"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "vpc_access_permissions_attachment" {
+  role   = aws_iam_role.this.name
+  policy = data.aws_iam_policy_document.vpc_access_permissions.json
+}
+
 resource "aws_lambda_alias" "this" {
   name = "active"
 
