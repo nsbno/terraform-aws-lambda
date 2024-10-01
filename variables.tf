@@ -4,6 +4,27 @@ variable "name" {
   type = string
 }
 
+variable "datadog_service_name" {
+  description = "The name of the service. A group of function names can be part of the same service"
+
+  default = null
+  type    = string
+}
+
+variable "team_name" {
+  description = "The team that owns the service"
+
+  type    = string
+  default = null
+}
+
+variable "custom_datadog_tags" {
+  description = "Custom tags to add to the Datadog Lambda Extension. Format: `key:value,key2:value2`"
+
+  type    = string
+  default = null
+}
+
 variable "artifact_type" {
   description = "The type of artifact to deploy"
 
@@ -27,6 +48,13 @@ variable "runtime" {
   description = "The runtime to use for the lambda function"
 
   type = string
+}
+
+variable "architectures" {
+  description = "The architectures to use for the lambda function"
+
+  type    = list(string)
+  default = ["x86_64"]
 }
 
 variable "handler" {
@@ -112,4 +140,30 @@ variable "provisioned_concurrency" {
   })
 
   default = null
+}
+
+# DATADOG
+
+variable "datadog_extension_layer_version" {
+  description = "Version for the Datadog Extension Layer"
+  type        = number
+  default     = 63
+}
+
+variable "datadog_java_layer_version" {
+  description = "Version for the Datadog Java Layer"
+  type        = number
+  default     = 15
+}
+
+variable "datadog_node_layer_version" {
+  description = "Version for the Datadog Node Layer"
+  type        = number
+  default     = 115
+}
+
+variable "datadog_python_layer_version" {
+  description = "Version for the Datadog Python Layer"
+  type        = number
+  default     = 98
 }
