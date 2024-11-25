@@ -15,3 +15,9 @@ variable "queue_arn" {
   description = "ARN of the SQS queue"
   type        = string
 }
+
+variable "batch_size" {
+  description = "The maximum number of events to retrieve in a single batch in the lambda"
+  type        = number
+  default     = null
+}
