@@ -32,6 +32,8 @@ resource "aws_lambda_function" "this" {
   runtime = var.artifact_type == "s3" ? var.runtime : null
   handler = var.handler
 
+  architectures = [var.architecture]
+
   memory_size = var.memory
 
   role = aws_iam_role.this.arn

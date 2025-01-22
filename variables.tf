@@ -23,6 +23,13 @@ variable "artifact" {
   })
 }
 
+variable "architecture" {
+  description = "Architecture the lambda is compatible with. Valid values are \"x86_64\" or \"arm64\""
+
+  type    = string
+  default = "x86_64"
+}
+
 variable "runtime" {
   description = "The runtime to use for the lambda function"
 
