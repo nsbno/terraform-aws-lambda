@@ -4,6 +4,12 @@ variable "name" {
   type = string
 }
 
+variable "lambda_function_description" {
+  description = "The description of the Lambda function"
+  type = string
+  default = null
+}
+
 variable "artifact_type" {
   description = "The type of artifact to deploy"
 
