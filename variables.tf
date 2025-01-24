@@ -120,3 +120,9 @@ variable "provisioned_concurrency" {
 
   default = null
 }
+
+variable "schedule" {
+  description = "Make the lambda run on a schedule. For example, cron(0 20 * * ? *) or rate(5 minutes)"
+  type        = string
+  default     = null
+}
