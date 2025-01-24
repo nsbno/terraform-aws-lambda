@@ -3,6 +3,13 @@ resource "aws_lambda_event_source_mapping" "receive_amount_of_developers" {
   event_source_arn        = var.queue_arn
   function_response_types = ["ReportBatchItemFailures"]
   batch_size              = var.batch_size
+
+  dynamic "scaling_config" {
+    for_each = var.sqs_lambda_event_source_mapping_maximum_concurrency != null ? [true] : []
+    content {
+      maximum_concurrency = var.sqs_lambda_event_source_mapping_maximum_concurrency
+    }
+  }
 }
 
 data "aws_iam_policy_document" "this" {
