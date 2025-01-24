@@ -103,7 +103,7 @@ resource "aws_lambda_alias" "this" {
 
 resource "aws_cloudwatch_log_group" "this" {
   name              = "/aws/lambda/${aws_lambda_function.this.function_name}"
-  retention_in_days = 30
+  retention_in_days = var.cloudwatch_logs_retention_in_days
 }
 
 data "aws_iam_policy_document" "allow_logging" {
