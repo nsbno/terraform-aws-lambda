@@ -6,8 +6,8 @@ variable "name" {
 
 variable "lambda_function_description" {
   description = "The description of the Lambda function"
-  type = string
-  default = null
+  type        = string
+  default     = null
 }
 
 variable "artifact_type" {
@@ -139,4 +139,8 @@ variable "cloudwatch_logs_retention_in_days" {
   default     = 30
 }
 
-
+variable "reserved_concurrent_executions" {
+  description = "The amount of reserved concurrent executions for this Lambda Function. A value of 0 disables Lambda Function from being triggered and -1 removes any concurrency limitations. Defaults to Unreserved Concurrency Limits -1."
+  type        = number
+  default     = null
+}

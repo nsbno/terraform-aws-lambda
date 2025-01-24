@@ -19,7 +19,7 @@ resource "aws_iam_role" "this" {
 
 resource "aws_lambda_function" "this" {
   function_name = var.name
-  description = var.lambda_function_description
+  description   = var.lambda_function_description
 
   package_type = var.artifact_type == "s3" ? "Zip" : "Image"
 
@@ -42,6 +42,8 @@ resource "aws_lambda_function" "this" {
   layers = var.layers
 
   publish = true
+
+  reserved_concurrent_executions = var.reserved_concurrent_executions
 
   dynamic "snap_start" {
     for_each = var.snap_start ? [{}] : []
