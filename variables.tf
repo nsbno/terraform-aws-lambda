@@ -129,11 +129,13 @@ variable "provisioned_concurrency" {
 
 variable "schedule" {
   description = "Make the lambda run on a schedule. For example, cron(0 20 * * ? *) or rate(5 minutes)"
-  type        = string
-  default     = null
+  type = object({
+    expression = string
+  })
+  default = null
 }
 
-variable "cloudwatch_logs_retention_in_days" {
+variable "logs_retention_in_days" {
   description = "Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653."
   type        = number
   default     = 30

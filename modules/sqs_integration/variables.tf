@@ -22,12 +22,12 @@ variable "batch_size" {
   default     = null
 }
 
-variable "sqs_lambda_event_source_mapping_maximum_concurrency" {
+variable "maximum_concurrency" {
   description = "Limits the number of concurrent Lambda instances that the Amazon SQS event source can invoke. Must be greater than or equal to 2"
   type        = number
   default     = null
   validation {
-    condition     = var.sqs_lambda_event_source_mapping_maximum_concurrency == null ? true : var.sqs_lambda_event_source_mapping_maximum_concurrency >= 2
+    condition     = var.maximum_concurrency == null ? true : var.maximum_concurrency >= 2
     error_message = "sqs_lambda_event_source_mapping_maximum_concurrency must be greater than or equal to 2"
   }
 }
