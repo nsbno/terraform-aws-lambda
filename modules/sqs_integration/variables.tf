@@ -28,6 +28,6 @@ variable "maximum_concurrency" {
   default     = null
   validation {
     condition     = var.maximum_concurrency == null ? true : var.maximum_concurrency >= 2
-    error_message = "sqs_lambda_event_source_mapping_maximum_concurrency must be greater than or equal to 2"
+    error_message = "maximum_concurrency must be greater than or equal to 2"
   }
 }

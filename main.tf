@@ -19,7 +19,7 @@ resource "aws_iam_role" "this" {
 
 resource "aws_lambda_function" "this" {
   function_name = var.name
-  description   = var.lambda_function_description
+  description   = var.description
 
   package_type = var.artifact_type == "s3" ? "Zip" : "Image"
 
@@ -106,7 +106,7 @@ resource "aws_lambda_alias" "this" {
 
 resource "aws_cloudwatch_log_group" "this" {
   name              = "/aws/lambda/${aws_lambda_function.this.function_name}"
-  retention_in_days = var.logs_retention_in_days
+  retention_in_days = var.log_retention_in_days
 }
 
 data "aws_iam_policy_document" "allow_logging" {
