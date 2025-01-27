@@ -39,7 +39,7 @@ resource "aws_lambda_function" "this" {
 
   role = aws_iam_role.this.arn
 
-  layers = var.layers
+  layers = var.enable_insights ? concat(var.layers, ["arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension:33"]) : var.layers
 
   publish = true
 
@@ -148,6 +148,12 @@ data "aws_iam_policy_document" "allow_x_ray" {
 resource "aws_iam_role_policy" "allow_tracing" {
   role   = aws_iam_role.this.id
   policy = data.aws_iam_policy_document.allow_x_ray.json
+}
+
+resource "aws_iam_role_policy_attachment" "insights_policy" {
+  count      = var.enable_insights ? 1 : 0
+  role       = aws_iam_role.this.id
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"
 }
 
 resource "aws_appautoscaling_target" "this" {

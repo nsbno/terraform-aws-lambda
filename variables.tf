@@ -152,3 +152,9 @@ variable "enable_json_log_level_metric_filter" {
   type        = bool
   default     = false
 }
+
+variable "enable_insights" {
+  description = "Enable Lambda Insights for more detailed monitoring"
+  type        = bool
+  default     = false
+}
