@@ -314,3 +314,26 @@ data "aws_iam_policy_document" "allow_scheduler_to_run_lambda" {
     ]
   }
 }
+
+/*
+* == End Scheduling
+ */
+
+// Metric filter on JSON log levels from the Lambda function
+resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
+  count          = var.enable_json_log_level_metric_filter ? 1 : 0
+  name           = "${aws_lambda_function.this.function_name}-log-levels"
+  pattern        = "{ $.level = * }"
+  log_group_name = aws_cloudwatch_log_group.this.name
+
+  metric_transformation {
+    name      = "LambdaLogLevels"
+    namespace = "LambdaLogLevels"
+    value     = "1"
+    unit      = "Count"
+    dimensions = {
+      level         = "$.level"
+      function_name = aws_lambda_function.this.function_name
+    }
+  }
+}

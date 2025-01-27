@@ -146,3 +146,9 @@ variable "reserved_concurrent_executions" {
   type        = number
   default     = null
 }
+
+variable "enable_json_log_level_metric_filter" {
+  description = "Enable JSON log level metric filter. Creates a metric on log levels from the Lambda function. The logs must be in JSON format, and must have a field named 'level'."
+  type        = bool
+  default     = false
+}
