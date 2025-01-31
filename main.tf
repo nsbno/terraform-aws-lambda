@@ -334,12 +334,11 @@ resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
 
   metric_transformation {
     name      = "LambdaLogLevels"
-    namespace = "LambdaLogLevels"
+    namespace = "Lambda/${aws_lambda_function.this.function_name}"
     value     = "1"
     unit      = "Count"
     dimensions = {
-      level         = "$.level"
-      function_name = aws_lambda_function.this.function_name
+      level = "$.level"
     }
   }
 }
