@@ -158,3 +158,9 @@ variable "enable_insights" {
   type        = bool
   default     = false
 }
+
+variable "log_group_name" {
+  description = "Override default log group name, if not set a default name will be used from the lambda function name"
+  type        = string
+  default     = null
+}
