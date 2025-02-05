@@ -105,7 +105,7 @@ resource "aws_lambda_alias" "this" {
 }
 
 resource "aws_cloudwatch_log_group" "this" {
-  name              = "/aws/lambda/${aws_lambda_function.this.function_name}"
+  name              = var.log_group_name != null ? "/aws/lambda/${var.log_group_name}" : "/aws/lambda/${aws_lambda_function.this.function_name}"
   retention_in_days = var.log_retention_in_days
 }
 
