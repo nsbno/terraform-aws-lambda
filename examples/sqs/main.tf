@@ -28,6 +28,9 @@ module "sqs_integration" {
   lambda = module.lambda
 
   queue_arn = module.request_queue.queue_arn
+
+  // Optional. This sets the maximum number of concurrent lambda executions that will be triggered by the SQS queue.
+  maximum_concurrency = 5
 }
 
 module "api_gateway" {

@@ -88,10 +88,11 @@ locals {
 
   handler = lookup(local.runtime_base_handler_map, local.runtime_base, var.handler)
 
-  layers = {
-    extension = [local.datadog_extension_layer_arn]
-    lambda    = local.datadog_lambda_layer_runtime == "" ? [] : [local.datadog_lambda_layer_arn]
-  }
+  lambda_layers = concat(
+    [local.datadog_extension_layer_arn]
+    local.datadog_lambda_layer_runtime == "" ? [] : [local.datadog_lambda_layer_arn]
+    var.layers
+  )
 }
 
 module "account_metadata" {
@@ -160,6 +161,7 @@ resource "aws_iam_role" "this" {
 
 resource "aws_lambda_function" "this" {
   function_name = var.name
+  description   = var.description
 
   package_type = var.artifact_type == "s3" ? "Zip" : "Image"
 
@@ -170,21 +172,23 @@ resource "aws_lambda_function" "this" {
 
   timeout = var.timeout
 
-  runtime       = var.artifact_type == "s3" ? var.runtime : null
-  handler       = local.handler
-  architectures = var.architectures
+  runtime = var.artifact_type == "s3" ? var.runtime : null
+  handler = local.handler
+
+  architectures = [var.architecture]
 
   memory_size = var.memory
 
   role = aws_iam_role.this.arn
 
-  layers = concat(
-    local.layers.extension,
-    local.layers.lambda,
-    var.layers
-  )
+  layers = var.enable_insights ? concat(
+    local.lambda_layers,
+    ["arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension:33"]
+  ) : local.lambda_layers
 
   publish = true
+
+  reserved_concurrent_executions = var.reserved_concurrent_executions
 
   dynamic "snap_start" {
     for_each = var.snap_start ? [{}] : []
@@ -208,6 +212,36 @@ resource "aws_lambda_function" "this" {
   }
 }
 
+data "aws_iam_policy_document" "vpc_access_permissions" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:CreateNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DescribeSubnets",
+      "ec2:DeleteNetworkInterface",
+      "ec2:AssignPrivateIpAddresses",
+      "ec2:UnassignPrivateIpAddresses"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeVpcs"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "vpc_access_permissions_attachment" {
+  role   = aws_iam_role.this.name
+  policy = data.aws_iam_policy_document.vpc_access_permissions.json
+}
+
 resource "aws_lambda_alias" "this" {
   name = "active"
 
@@ -216,8 +250,8 @@ resource "aws_lambda_alias" "this" {
 }
 
 resource "aws_cloudwatch_log_group" "this" {
-  name              = "/aws/lambda/${aws_lambda_function.this.function_name}"
-  retention_in_days = 30
+  name              = var.log_group_name != null ? "/aws/lambda/${var.log_group_name}" : "/aws/lambda/${aws_lambda_function.this.function_name}"
+  retention_in_days = var.log_retention_in_days
 }
 
 data "aws_iam_policy_document" "allow_logging" {
@@ -259,6 +293,12 @@ data "aws_iam_policy_document" "allow_x_ray" {
 resource "aws_iam_role_policy" "allow_tracing" {
   role   = aws_iam_role.this.id
   policy = data.aws_iam_policy_document.allow_x_ray.json
+}
+
+resource "aws_iam_role_policy_attachment" "insights_policy" {
+  count      = var.enable_insights ? 1 : 0
+  role       = aws_iam_role.this.id
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"
 }
 
 resource "aws_appautoscaling_target" "this" {
@@ -346,5 +386,104 @@ resource "aws_appautoscaling_scheduled_action" "this" {
   scalable_target_action {
     min_capacity = each.value.minimum_capacity
     max_capacity = each.value.maximum_capacity
+  }
+}
+
+/*
+* == Scheduling
+ */
+
+resource "aws_scheduler_schedule" "schedule" {
+  count       = var.schedule != null ? 1 : 0
+  name        = "${aws_lambda_function.this.function_name}-schedule"
+  description = "Schedule for Lambda Function ${aws_lambda_function.this.function_name}"
+  group_name  = "default"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression = var.schedule.expression
+
+  target {
+    arn      = aws_lambda_function.this.qualified_arn
+    role_arn = aws_iam_role.allow_scheduler_to_run_lambda[0].arn
+
+    input = "{}"
+
+    retry_policy {
+      maximum_event_age_in_seconds = 300
+      maximum_retry_attempts       = 1
+    }
+  }
+
+  depends_on = [
+    aws_iam_role.allow_scheduler_to_run_lambda
+  ]
+}
+
+resource "aws_iam_role" "allow_scheduler_to_run_lambda" {
+  count = var.schedule != null ? 1 : 0
+  name  = "${aws_lambda_function.this.function_name}-schedule"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "scheduler.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "allow_scheduler_to_run_lambda" {
+  count       = var.schedule != null ? 1 : 0
+  name        = "${aws_lambda_function.this.function_name}-schedule"
+  description = "Policy to allow scheduler to run lambda"
+  policy      = data.aws_iam_policy_document.allow_scheduler_to_run_lambda.json
+}
+
+resource "aws_iam_role_policy_attachment" "allow_scheduler_to_run_lambda" {
+  count      = var.schedule != null ? 1 : 0
+  role       = aws_iam_role.allow_scheduler_to_run_lambda[0].name
+  policy_arn = aws_iam_policy.allow_scheduler_to_run_lambda[0].arn
+}
+
+data "aws_iam_policy_document" "allow_scheduler_to_run_lambda" {
+  statement {
+    sid = "1"
+
+    actions = [
+      "lambda:InvokeFunction"
+    ]
+
+    resources = [
+      aws_lambda_function.this.qualified_arn
+    ]
+  }
+}
+
+/*
+* == End Scheduling
+ */
+
+// Metric filter on JSON log levels from the Lambda function
+resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
+  count          = var.enable_json_log_level_metric_filter ? 1 : 0
+  name           = "${aws_lambda_function.this.function_name}-log-levels"
+  pattern        = "{ $.level = * }"
+  log_group_name = aws_cloudwatch_log_group.this.name
+
+  metric_transformation {
+    name      = "LambdaLogLevels"
+    namespace = "Lambda/${aws_lambda_function.this.function_name}"
+    value     = "1"
+    unit      = "Count"
+    dimensions = {
+      level = "$.level"
+    }
   }
 }

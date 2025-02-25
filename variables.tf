@@ -25,6 +25,12 @@ variable "custom_datadog_tags" {
   default = null
 }
 
+variable "description" {
+  description = "The description of the Lambda function"
+  type        = string
+  default     = null
+}
+
 variable "artifact_type" {
   description = "The type of artifact to deploy"
 
@@ -44,17 +50,17 @@ variable "artifact" {
   })
 }
 
+variable "architecture" {
+  description = "Architecture the lambda is compatible with. Valid values are \"x86_64\" or \"arm64\""
+
+  type    = string
+  default = "x86_64"
+}
+
 variable "runtime" {
   description = "The runtime to use for the lambda function"
 
   type = string
-}
-
-variable "architectures" {
-  description = "The architectures to use for the lambda function"
-
-  type    = list(string)
-  default = ["x86_64"]
 }
 
 variable "handler" {
@@ -140,6 +146,44 @@ variable "provisioned_concurrency" {
   })
 
   default = null
+}
+
+variable "schedule" {
+  description = "Make the lambda run on a schedule. For example, cron(0 20 * * ? *) or rate(5 minutes)"
+  type = object({
+    expression = string
+  })
+  default = null
+}
+
+variable "log_retention_in_days" {
+  description = "Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653."
+  type        = number
+  default     = 30
+}
+
+variable "reserved_concurrent_executions" {
+  description = "The amount of reserved concurrent executions for this Lambda Function. A value of 0 disables Lambda Function from being triggered and -1 removes any concurrency limitations. Defaults to Unreserved Concurrency Limits -1."
+  type        = number
+  default     = null
+}
+
+variable "enable_json_log_level_metric_filter" {
+  description = "Enable JSON log level metric filter. Creates a metric on log levels from the Lambda function. The logs must be in JSON format, and must have a field named 'level'."
+  type        = bool
+  default     = false
+}
+
+variable "enable_insights" {
+  description = "Enable Lambda Insights for more detailed monitoring"
+  type        = bool
+  default     = false
+}
+
+variable "log_group_name" {
+  description = "Override default log group name, if not set a default name will be used from the lambda function name"
+  type        = string
+  default     = null
 }
 
 # DATADOG
