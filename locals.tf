@@ -64,6 +64,11 @@ locals {
       var.team_name != null ? format("team:%s", var.team_name) : null
   ]))
 
+  # The account alias includes the name of the environment we are in as a suffix
+  split_alias = split("-", data.aws_iam_account_alias.this.account_alias)
+  environment_index = length(local.split_alias) - 1
+  environment  = local.split_alias[local.environment_index]
+
   environment_variables = {
     common = {
       DD_CAPTURE_LAMBDA_PAYLOAD       = "false"
@@ -74,7 +79,7 @@ locals {
       DD_PROFILING_ENABLED            = "true"
       DD_EXTENSION_VERSION            = "next"
       DD_SERVICE                      = var.datadog_service_name == null ? var.name : var.datadog_service_name
-      DD_ENV                          = module.account_metadata.account.environment
+      DD_ENV                          = local.environment
       DD_SERVICE_MAPPING              = "lambda_api_gateway:aws.apigw.${var.name},lambda_sns:aws.sns.${var.name},lambda_sqs:aws.sqs.${var.name},lambda_s3:aws.s3.${var.name},lambda_dynamodb:aws.dynamodb.${var.name},eventbridge.custom.event.sender:aws.eventbridge.${var.name},MyStream:aws.kinesis.${var.name}"
       DD_VERSION                      = var.artifact.version
       DD_API_KEY_SECRET_ARN           = data.aws_secretsmanager_secret.datadog_api_key.arn

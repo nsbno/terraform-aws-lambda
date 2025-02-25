@@ -4,27 +4,6 @@ variable "name" {
   type = string
 }
 
-variable "datadog_service_name" {
-  description = "The name of the service. A group of function names can be part of the same service"
-
-  default = null
-  type    = string
-}
-
-variable "team_name" {
-  description = "The team that owns the service"
-
-  type    = string
-  default = null
-}
-
-variable "custom_datadog_tags" {
-  description = "Custom tags to add to the Datadog Lambda Extension. Format: `key:value,key2:value2`"
-
-  type    = string
-  default = null
-}
-
 variable "description" {
   description = "The description of the Lambda function"
   type        = string
@@ -187,6 +166,27 @@ variable "log_group_name" {
 }
 
 # DATADOG
+
+variable "datadog_service_name" {
+  description = "The name of the service. A group of function names can be part of the same service"
+
+  default = null
+  type    = string
+}
+
+variable "team_name" {
+  description = "The team that owns the service"
+
+  type    = string
+  default = null
+}
+
+variable "custom_datadog_tags" {
+  description = "Custom tags to add to the Datadog Lambda Extension. Format: `key:value,key2:value2`"
+
+  type    = string
+  default = null
+}
 
 variable "datadog_extension_layer_version" {
   description = "Version for the Datadog Extension Layer"
