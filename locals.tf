@@ -55,7 +55,7 @@ locals {
 
   datadog_account_id      = "464622532012"
   datadog_layer_name_base = "arn:aws:lambda:${data.aws_region.current.name}:${local.datadog_account_id}:layer"
-  datadog_layer_suffix    = lookup(local.architecture_layer_suffix_map, var.architectures[0])
+  datadog_layer_suffix    = lookup(local.architecture_layer_suffix_map, var.architecture)
 
   combined_tags = (
     var.custom_datadog_tags == null && var.team_name == null
