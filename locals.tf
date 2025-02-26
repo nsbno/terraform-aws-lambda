@@ -78,7 +78,6 @@ locals {
       DD_EXTENSION_VERSION            = "next"
       DD_SERVICE                      = var.datadog_service_name == null ? var.name : var.datadog_service_name
       DD_ENV                          = local.environment
-      DD_SERVICE_MAPPING              = "lambda_api_gateway:aws.apigw.${var.name},lambda_sns:aws.sns.${var.name},lambda_sqs:aws.sqs.${var.name},lambda_s3:aws.s3.${var.name},lambda_dynamodb:aws.dynamodb.${var.name},eventbridge.custom.event.sender:aws.eventbridge.${var.name},MyStream:aws.kinesis.${var.name}"
       DD_VERSION                      = var.artifact.version
       DD_API_KEY_SECRET_ARN           = data.aws_secretsmanager_secret.datadog_api_key.arn
       DD_SITE                         = "datadoghq.eu"
