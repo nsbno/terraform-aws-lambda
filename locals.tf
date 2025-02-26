@@ -85,6 +85,7 @@ locals {
       DD_API_KEY_SECRET_ARN           = data.aws_secretsmanager_secret.datadog_api_key.arn
       DD_SITE                         = "datadoghq.eu"
       DD_TRACE_ENABLED                = "true"
+      DD_TRACE_REMOVE_INTEGRATION_SERVICE_NAMES_ENABLED = "true"
       DD_TAGS                         = local.combined_tags
     }
     runtime = lookup(local.runtime_base_environment_variable_map, local.runtime_base, {})
