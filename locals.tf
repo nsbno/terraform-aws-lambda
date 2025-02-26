@@ -57,9 +57,7 @@ locals {
   datadog_layer_name_base = "arn:aws:lambda:${data.aws_region.current.name}:${local.datadog_account_id}:layer"
   datadog_layer_suffix    = lookup(local.architecture_layer_suffix_map, var.architecture)
 
-  combined_tags = (
-    var.custom_datadog_tags == null
-    ) ? "" : join(",", compact([
+  combined_tags = join(",", compact([
       var.custom_datadog_tags,
       format("team:%s", data.aws_ssm_parameter.team_name.value)
   ]))
