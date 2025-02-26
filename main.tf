@@ -2,6 +2,11 @@ data "aws_iam_account_alias" "this" {}
 
 data "aws_region" "current" {}
 
+# Team name fetched to be used for Datadog Team Tag
+data "aws_ssm_parameter" "team_name" {
+  name = "/__platform__/team_name_handle"
+}
+
 data "aws_secretsmanager_secret" "datadog_api_key" {
   arn = "arn:aws:secretsmanager:eu-west-1:727646359971:secret:datadog_agent_api_key"
 }
@@ -41,7 +46,7 @@ data "aws_iam_policy_document" "assume_role_policy" {
     effect = "Allow"
 
     principals {
-      type        = "Service"
+      type = "Service"
       identifiers = ["lambda.amazonaws.com"]
     }
 
@@ -69,7 +74,7 @@ resource "aws_lambda_function" "this" {
   timeout = var.timeout
 
   runtime = var.artifact_type == "s3" ? var.runtime : null
-  handler = local.handler
+  handler = var.enable_datadog ? local.handler : var.handler
 
   architectures = [var.architecture]
 
@@ -104,7 +109,7 @@ resource "aws_lambda_function" "this" {
   }
 
   environment {
-    variables = merge(var.environment_variables, local.environment_variables.common, local.environment_variables.runtime)
+    variables = var.enable_datadog ? merge(var.environment_variables, local.environment_variables.common, local.environment_variables.runtime) : var.environment_variables
   }
 }
 

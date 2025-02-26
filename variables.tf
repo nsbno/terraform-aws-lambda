@@ -16,7 +16,7 @@ variable "artifact_type" {
   type = string
 
   validation {
-    condition     = contains(["s3", "ecr"], var.artifact_type)
+    condition = contains(["s3", "ecr"], var.artifact_type)
     error_message = "Artifact type must be one of `s3` or `ecr`."
   }
 }
@@ -58,7 +58,7 @@ variable "timeout" {
 variable "environment_variables" {
   description = "Environment variables to set for the lambda function"
 
-  type    = map(string)
+  type = map(string)
   default = {}
 }
 
@@ -72,21 +72,21 @@ variable "memory" {
 variable "layers" {
   description = "List of lambda layer version ARNs (maximum of 5) to attach to your lambda function"
 
-  type    = list(string)
+  type = list(string)
   default = []
 }
 
 variable "subnet_ids" {
   description = "List of subnet IDs to place the lambda function within. Part of VPC config"
 
-  type    = list(string)
+  type = list(string)
   default = []
 }
 
 variable "security_group_ids" {
   description = "List of security group IDs to place the lambda function within. Part of VPC config"
 
-  type    = list(string)
+  type = list(string)
   default = []
 }
 
@@ -110,10 +110,10 @@ variable "provisioned_concurrency" {
   nullable = true
 
   type = object({
-    minimum_capacity   = number
-    maximum_capacity   = number
+    minimum_capacity = number
+    maximum_capacity = number
     target_utilization = optional(number, 0.8)
-    scale_in_cooldown  = optional(number, 600)
+    scale_in_cooldown = optional(number, 600)
     scale_out_cooldown = optional(number, 120)
     schedules = optional(list(object({
       timezone = string
@@ -166,19 +166,18 @@ variable "log_group_name" {
 }
 
 # DATADOG
+variable "enable_datadog" {
+  description = "Enable Datadog Lambda Extension"
+
+  type    = bool
+  default = true
+}
 
 variable "datadog_service_name" {
   description = "The name of the service. A group of function names can be part of the same service"
 
   default = null
   type    = string
-}
-
-variable "team_name" {
-  description = "The team that owns the service"
-
-  type    = string
-  default = null
 }
 
 variable "custom_datadog_tags" {

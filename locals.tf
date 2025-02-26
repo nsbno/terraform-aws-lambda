@@ -58,10 +58,10 @@ locals {
   datadog_layer_suffix    = lookup(local.architecture_layer_suffix_map, var.architecture)
 
   combined_tags = (
-    var.custom_datadog_tags == null && var.team_name == null
+    var.custom_datadog_tags == null
     ) ? "" : join(",", compact([
       var.custom_datadog_tags,
-      var.team_name != null ? format("team:%s", var.team_name) : null
+      format("team:%s", data.aws_ssm_parameter.team_name.value)
   ]))
 
   # The account alias includes the name of the environment we are in as a suffix
@@ -93,9 +93,9 @@ locals {
 
   handler = lookup(local.runtime_base_handler_map, local.runtime_base, var.handler)
 
-  lambda_layers = concat(
+  lambda_layers = var.enable_datadog ? concat(
     [local.datadog_extension_layer_arn],
     local.datadog_lambda_layer_runtime == "" ? [] : [local.datadog_lambda_layer_arn],
     var.layers
-  )
+  ) : var.layers
 }
