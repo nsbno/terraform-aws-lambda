@@ -1,4 +1,3 @@
-
 # Locals from datadog module: https://github.com/DataDog/terraform-aws-lambda-datadog/blob/main/main.tf
 locals {
   architecture_layer_suffix_map = {
@@ -35,6 +34,7 @@ locals {
     "nodejs16.x" = "Datadog-Node16-x"
     "nodejs18.x" = "Datadog-Node18-x"
     "nodejs20.x" = "Datadog-Node20-x"
+    "nodejs22.x" = "Datadog-Node22-x"
     "python3.8"  = "Datadog-Python38"
     "python3.9"  = "Datadog-Python39"
     "python3.10" = "Datadog-Python310"
