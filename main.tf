@@ -4,6 +4,8 @@ data "aws_region" "current" {}
 
 # Team name fetched to be used for Datadog Team Tag
 data "aws_ssm_parameter" "team_name" {
+  count = var.enable_datadog ? 1 : 0
+
   name = "/__platform__/team_name_handle"
 }
 
@@ -46,7 +48,7 @@ data "aws_iam_policy_document" "assume_role_policy" {
     effect = "Allow"
 
     principals {
-      type = "Service"
+      type        = "Service"
       identifiers = ["lambda.amazonaws.com"]
     }
 

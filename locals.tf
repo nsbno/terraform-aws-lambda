@@ -57,15 +57,17 @@ locals {
   datadog_layer_name_base = "arn:aws:lambda:${data.aws_region.current.name}:${local.datadog_account_id}:layer"
   datadog_layer_suffix    = lookup(local.architecture_layer_suffix_map, var.architecture)
 
+  team_name_tag = var.enable_datadog && length(data.aws_ssm_parameter.team_name) > 0 ? format("team:%s", data.aws_ssm_parameter.team_name[0].value) : null
+
   combined_tags = join(",", compact([
-      var.custom_datadog_tags,
-      format("team:%s", data.aws_ssm_parameter.team_name.value)
+    var.custom_datadog_tags,
+    local.team_name_tag,
   ]))
 
   # The account alias includes the name of the environment we are in as a suffix
-  split_alias = split("-", data.aws_iam_account_alias.this.account_alias)
+  split_alias       = split("-", data.aws_iam_account_alias.this.account_alias)
   environment_index = length(local.split_alias) - 1
-  environment  = local.split_alias[local.environment_index]
+  environment       = local.split_alias[local.environment_index]
 
   environment_variables = {
     common = {
