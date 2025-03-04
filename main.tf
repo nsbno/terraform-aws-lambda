@@ -31,7 +31,7 @@ resource "aws_lambda_function" "this" {
   timeout = var.timeout
 
   runtime = var.artifact_type == "s3" ? var.runtime : null
-  handler = var.handler
+  handler = var.enable_datadog ? local.handler : var.handler
 
   architectures = [var.architecture]
 
@@ -39,7 +39,10 @@ resource "aws_lambda_function" "this" {
 
   role = aws_iam_role.this.arn
 
-  layers = var.enable_insights ? concat(var.layers, ["arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension:33"]) : var.layers
+  layers = var.enable_insights ? concat(
+    local.lambda_layers,
+    ["arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension:33"]
+  ) : local.lambda_layers
 
   publish = true
 
@@ -63,7 +66,7 @@ resource "aws_lambda_function" "this" {
   }
 
   environment {
-    variables = var.environment_variables
+    variables = var.enable_datadog ? merge(var.environment_variables, local.environment_variables.common, local.environment_variables.runtime) : var.environment_variables
   }
 }
 

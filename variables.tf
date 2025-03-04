@@ -164,3 +164,49 @@ variable "log_group_name" {
   type        = string
   default     = null
 }
+
+# DATADOG
+variable "enable_datadog" {
+  description = "Enable Datadog Lambda Extension"
+
+  type    = bool
+  default = false
+}
+
+variable "datadog_service_name" {
+  description = "The name of the service. A group of function names can be part of the same service"
+
+  default = null
+  type    = string
+}
+
+variable "custom_datadog_tags" {
+  description = "Custom tags to add to the Datadog Lambda Extension. Format: `key:value,key2:value2`"
+
+  type    = string
+  default = null
+}
+
+variable "datadog_extension_layer_version" {
+  description = "Version for the Datadog Extension Layer"
+  type        = number
+  default     = 72
+}
+
+variable "datadog_java_layer_version" {
+  description = "Version for the Datadog Java Layer"
+  type        = number
+  default     = 18
+}
+
+variable "datadog_node_layer_version" {
+  description = "Version for the Datadog Node Layer"
+  type        = number
+  default     = 121
+}
+
+variable "datadog_python_layer_version" {
+  description = "Version for the Datadog Python Layer"
+  type        = number
+  default     = 105
+}

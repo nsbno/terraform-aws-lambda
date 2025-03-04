@@ -50,3 +50,6 @@ This example shows a Lambda that is triggered by an SQS queue.
 
 link:examples/provisioned_concurrency[Provisioned Concurrency]::
 An example with autoscaling provisioned concurrency.
+
+link:examples/datadog[Datadog]::
+An example with Datadog integration.
