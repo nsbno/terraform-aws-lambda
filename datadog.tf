@@ -1,3 +1,48 @@
+data "aws_iam_account_alias" "this" {}
+
+data "aws_region" "current" {}
+
+# Team name fetched to be used for Datadog Team Tag
+data "aws_ssm_parameter" "team_name" {
+  count = var.enable_datadog ? 1 : 0
+
+  name = "/__platform__/team_name_handle"
+}
+
+data "aws_secretsmanager_secret" "datadog_api_key" {
+  arn = "arn:aws:secretsmanager:eu-west-1:727646359971:secret:datadog_agent_api_key"
+}
+
+data "aws_iam_policy_document" "secrets_manager" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [
+      data.aws_secretsmanager_secret.datadog_api_key.arn,
+    ]
+  }
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt"
+    ]
+
+    resources = [
+      "arn:aws:kms:eu-west-1:727646359971:key/1bfdf87f-a69c-41f8-929a-2a491fc64f69",
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "secrets_manager" {
+  role   = aws_iam_role.this.id
+  policy = data.aws_iam_policy_document.secrets_manager.json
+}
+
 # Locals from datadog module: https://github.com/DataDog/terraform-aws-lambda-datadog/blob/main/main.tf
 locals {
   architecture_layer_suffix_map = {
@@ -71,21 +116,22 @@ locals {
 
   environment_variables = {
     common = {
-      DD_CAPTURE_LAMBDA_PAYLOAD       = "false"
-      DD_LOGS_INJECTION               = "false"
-      DD_MERGE_XRAY_TRACES            = "true"
-      DD_SERVERLESS_LOGS_ENABLED      = "true"
-      DD_LOGS_CONFIG_PROCESSING_RULES = "[{ \"type\" : \"exclude_at_match\", \"name\" :\"exclude_start_and_end_logs\", \"pattern\" : \"(START|END|REPORT) RequestId\" }]"
-      DD_PROFILING_ENABLED            = "true"
-      DD_EXTENSION_VERSION            = "next"
-      DD_SERVICE                      = var.datadog_service_name == null ? var.name : var.datadog_service_name
-      DD_ENV                          = local.environment
-      DD_SERVICE_MAPPING              = "lambda_api_gateway:aws.apigw.${var.name},lambda_sns:aws.sns.${var.name},lambda_sqs:aws.sqs.${var.name},lambda_s3:aws.s3.${var.name},lambda_dynamodb:aws.dynamodb.${var.name},eventbridge.custom.event.sender:aws.eventbridge.${var.name},MyStream:aws.kinesis.${var.name}"
-      DD_VERSION                      = var.artifact.version
-      DD_API_KEY_SECRET_ARN           = data.aws_secretsmanager_secret.datadog_api_key.arn
-      DD_SITE                         = "datadoghq.eu"
-      DD_TRACE_ENABLED                = "true"
-      DD_TAGS                         = local.combined_tags
+      DD_CAPTURE_LAMBDA_PAYLOAD                         = "false"
+      DD_LOGS_INJECTION                                 = "false"
+      DD_MERGE_XRAY_TRACES                              = "true"
+      DD_SERVERLESS_LOGS_ENABLED                        = "true"
+      DD_LOGS_CONFIG_PROCESSING_RULES                   = "[{ \"type\" : \"exclude_at_match\", \"name\" :\"exclude_start_and_end_logs\", \"pattern\" : \"(START|END|REPORT) RequestId\" }]"
+      DD_PROFILING_ENABLED                              = "true"
+      DD_EXTENSION_VERSION                              = "next"
+      DD_SERVICE                                        = var.datadog_service_name == null ? var.name : var.datadog_service_name
+      DD_ENV                                            = local.environment
+      DD_SERVICE_MAPPING                                = "lambda_api_gateway:aws.apigw.${var.name},lambda_sns:aws.sns.${var.name},lambda_sqs:aws.sqs.${var.name},lambda_s3:aws.s3.${var.name},lambda_dynamodb:aws.dynamodb.${var.name},eventbridge.custom.event.sender:aws.eventbridge.${var.name},MyStream:aws.kinesis.${var.name}"
+      DD_VERSION                                        = var.artifact.version
+      DD_API_KEY_SECRET_ARN                             = data.aws_secretsmanager_secret.datadog_api_key.arn
+      DD_SITE                                           = "datadoghq.eu"
+      DD_TRACE_ENABLED                                  = "true"
+      DD_TAGS                                           = local.combined_tags
+      DD_TRACE_REMOVE_INTEGRATION_SERVICE_NAMES_ENABLED = "true"
     }
     runtime = lookup(local.runtime_base_environment_variable_map, local.runtime_base, {})
   }
