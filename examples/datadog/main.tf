@@ -24,7 +24,7 @@ module "lambda" {
   source = "../../"
 
   enable_datadog = true
-  name           = module.datadog_service.service_name
+  service_name   = module.datadog_service.service_name
 
   artifact_type = "s3"
   artifact      = data.vy_artifact_version.this

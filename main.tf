@@ -1,3 +1,7 @@
+locals {
+  function_name = var.component_name ? "${var.service_name}-${var.component_name}" : var.service_name
+}
+
 data "aws_iam_policy_document" "assume_role_policy" {
   statement {
     effect = "Allow"
@@ -12,13 +16,13 @@ data "aws_iam_policy_document" "assume_role_policy" {
 }
 
 resource "aws_iam_role" "this" {
-  name = "${var.name}-lambda"
+  name = "${local.function_name}-lambda"
 
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 }
 
 resource "aws_lambda_function" "this" {
-  function_name = var.name
+  function_name = local.function_name
   description   = var.description
 
   package_type = var.artifact_type == "s3" ? "Zip" : "Image"
@@ -174,7 +178,7 @@ resource "aws_appautoscaling_target" "this" {
 resource "aws_appautoscaling_policy" "this" {
   count = var.provisioned_concurrency != null ? 1 : 0
 
-  name        = "${var.name}-lambda-auto-scaling"
+  name        = "${local.function_name}-lambda-auto-scaling"
   policy_type = "TargetTrackingScaling"
 
   resource_id        = aws_appautoscaling_target.this[0].resource_id
@@ -233,7 +237,7 @@ resource "aws_appautoscaling_scheduled_action" "this" {
     for v in var.provisioned_concurrency.schedules : v.schedule => v
   } : {}
 
-  name               = "${var.name}-lambda-scheduled-scaling"
+  name               = "${local.function_name}-lambda-scheduled-scaling"
   resource_id        = aws_appautoscaling_target.this[0].resource_id
   scalable_dimension = aws_appautoscaling_target.this[0].scalable_dimension
   service_namespace  = aws_appautoscaling_target.this[0].service_namespace

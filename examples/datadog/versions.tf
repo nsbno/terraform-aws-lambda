@@ -25,6 +25,5 @@ module "datadog_provider_setup" {
 provider "datadog" {
   api_key = module.datadog_provider_setup.api_key
   app_key = module.datadog_provider_setup.app_key
-
-  api_url = "https://api.datadoghq.eu/"
+  api_url = module.datadog_provider_setup.api_url
 }
