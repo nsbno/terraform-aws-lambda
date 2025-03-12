@@ -1,5 +1,5 @@
 locals {
-  function_name = var.component_name ? "${var.service_name}-${var.component_name}" : var.service_name
+  function_name = var.component_name != null ? "${var.service_name}-${var.component_name}" : var.service_name
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
