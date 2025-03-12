@@ -23,9 +23,9 @@ module "datadog_service" {
 module "get-lambda" {
   source = "../../"
 
-  enable_datadog        = true
-  datadaog_service_name = module.datadog_service.service_name
-  name                  = "get-user"
+  enable_datadog = true
+  service_name   = local.application_name
+  component_name = "get-user"
 
   artifact_type = "s3"
   artifact      = data.vy_artifact_version.this
@@ -37,9 +37,9 @@ module "get-lambda" {
 module "put-lambda" {
   source = "../../"
 
-  enable_datadog        = true
-  datadaog_service_name = module.datadog_service.service_name
-  name                  = "put-user"
+  enable_datadog = true
+  service_name   = local.application_name
+  component_name = "put-user"
 
   artifact_type = "s3"
   artifact      = data.vy_artifact_version.this

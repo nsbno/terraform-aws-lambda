@@ -1,7 +1,14 @@
-variable "name" {
-  description = "The name of the lambda function"
+variable "service_name" {
+  description = "The name of the service. A group of function names can be part of the same service"
 
   type = string
+}
+
+variable "component_name" {
+  description = "The name of the component. Will be appended to the service_name if used"
+
+  default = null
+  type    = string
 }
 
 variable "description" {
@@ -171,13 +178,6 @@ variable "enable_datadog" {
 
   type    = bool
   default = false
-}
-
-variable "datadog_service_name" {
-  description = "The name of the service. A group of function names can be part of the same service"
-
-  default = null
-  type    = string
 }
 
 variable "custom_datadog_tags" {
