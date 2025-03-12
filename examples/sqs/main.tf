@@ -5,7 +5,7 @@ data "vy_artifact_version" "this" {
 module "lambda" {
   source = "../../"
 
-  name = "get-users"
+  service_name = "user-service"
 
   artifact_type = "s3"
   artifact      = data.vy_artifact_version.this
