@@ -85,6 +85,7 @@ locals {
     "python3.10" = "Datadog-Python310"
     "python3.11" = "Datadog-Python311"
     "python3.12" = "Datadog-Python312"
+    "python3.13" = "Datadog-Python313"
   }
 }
 
