@@ -1,5 +1,6 @@
 locals {
-  function_name = var.component_name != null ? "${var.service_name}-${var.component_name}" : var.service_name
+  function_name  = var.component_name != null ? "${var.service_name}-${var.component_name}" : var.service_name
+  log_group_name = var.log_group_name != null ? "/aws/lambda/${var.log_group_name}" : "/aws/lambda/${local.function_name}"
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -69,6 +70,11 @@ resource "aws_lambda_function" "this" {
     security_group_ids = var.security_group_ids
   }
 
+  logging_config {
+    log_format = "Text"
+    log_group  = local.log_group_name
+  }
+
   environment {
     variables = var.enable_datadog ? merge(var.environment_variables, local.environment_variables.common, local.environment_variables.runtime) : var.environment_variables
   }
@@ -112,7 +118,7 @@ resource "aws_lambda_alias" "this" {
 }
 
 resource "aws_cloudwatch_log_group" "this" {
-  name              = var.log_group_name != null ? "/aws/lambda/${var.log_group_name}" : "/aws/lambda/${aws_lambda_function.this.function_name}"
+  name              = local.log_group_name
   retention_in_days = var.log_retention_in_days
 }
 
