@@ -71,7 +71,7 @@ resource "aws_lambda_function" "this" {
   }
 
   logging_config {
-    log_format = "Text"
+    log_format = var.log_format
     log_group  = local.log_group_name
   }
 
