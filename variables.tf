@@ -172,6 +172,17 @@ variable "log_group_name" {
   default     = null
 }
 
+variable "log_format" {
+  description = "The format of the logs. Can be either `Text` or `JSON`. Defaults to `Text`."
+  type        = string
+  default     = "Text"
+
+  validation {
+    condition     = contains(["Text", "JSON"], var.log_format)
+    error_message = "Log format must be one of `Text` or `JSON`."
+  }
+}
+
 # DATADOG
 variable "enable_datadog" {
   description = "Enable Datadog Lambda Extension"
