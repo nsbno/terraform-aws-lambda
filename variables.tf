@@ -216,8 +216,20 @@ variable "datadog_node_layer_version" {
   default     = 124
 }
 
+variable "datadog_profiling_enabled" {
+  description = "Enable Datadog profiling"
+  type        = bool
+  default     = false
+}
+
 variable "datadog_python_layer_version" {
   description = "Version for the Datadog Python Layer"
   type        = number
   default     = 106
+}
+
+variable "datadog_profiling_enabled" {
+  description = "Enable Datadog profiling"
+  type        = bool
+  default     = false
 }

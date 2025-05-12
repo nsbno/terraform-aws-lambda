@@ -122,7 +122,7 @@ locals {
       DD_MERGE_XRAY_TRACES                              = "true"
       DD_SERVERLESS_LOGS_ENABLED                        = "true"
       DD_LOGS_CONFIG_PROCESSING_RULES                   = "[{ \"type\" : \"exclude_at_match\", \"name\" :\"exclude_start_and_end_logs\", \"pattern\" : \"(START|END|REPORT) RequestId\" }]"
-      DD_PROFILING_ENABLED                              = "true"
+      DD_PROFILING_ENABLED                              = var.datadog_profiling_enabled
       DD_EXTENSION_VERSION                              = "next"
       DD_SERVICE                                        = var.service_name
       DD_ENV                                            = local.environment
