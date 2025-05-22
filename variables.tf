@@ -235,3 +235,10 @@ variable "rollback_window_in_minutes" {
   type        = number
   default     = 0
 }
+
+variable "ecr_repository_url" {
+  description = "Repository url for the ECR image"
+  type        = string
+
+  default     = null
+}
