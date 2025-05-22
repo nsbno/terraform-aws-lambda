@@ -19,13 +19,9 @@ variable "description" {
 
 variable "artifact_type" {
   description = "The type of artifact to deploy"
-
   type = string
 
-  validation {
-    condition     = contains(["s3", "ecr"], var.artifact_type)
-    error_message = "Artifact type must be one of `s3` or `ecr`."
-  }
+  default = null
 }
 
 variable "artifact" {
@@ -34,6 +30,8 @@ variable "artifact" {
     path    = string
     version = string
   })
+
+  default = null
 }
 
 variable "architecture" {
