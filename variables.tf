@@ -227,3 +227,11 @@ variable "datadog_profiling_enabled" {
   type        = bool
   default     = false
 }
+
+# CODEDEPLOY
+
+variable "rollback_window_in_minutes" {
+  description = "The rollback window in minutes"
+  type        = number
+  default     = 0
+}

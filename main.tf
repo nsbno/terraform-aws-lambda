@@ -355,3 +355,14 @@ resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
     }
   }
 }
+
+module "codedeploy" {
+  source = "./modules/codedeploy"
+
+  function_name         = local.function_name
+  artifact              = var.artifact
+  deployment_group_name = "${local.function_name}-deployment-group"
+  lambda_image_uri      = aws_lambda_function.this.image_uri
+
+  rollback_window_in_minutes = var.rollback_window_in_minutes
+}
