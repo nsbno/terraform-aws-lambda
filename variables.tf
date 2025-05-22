@@ -41,6 +41,7 @@ variable "artifact" {
     path    = string
     version = string
   })
+  default = null
 }
 
 variable "architecture" {

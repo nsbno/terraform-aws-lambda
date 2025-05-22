@@ -57,9 +57,9 @@ locals {
 	codedeploy_deployment_group = aws_codedeploy_deployment_group.this.deployment_group_name
 	codedeploy_application_name = aws_codedeploy_app.this.name
 	lambda_function_name        = var.function_name
-	lambda_s3_bucket            = var.artifact.store
-	lambda_s3_folder            = var.artifact.path
-	lambda_image_uri            = var.lambda_image_uri
+	lambda_s3_bucket            = var.artifact != null ? var.artifact.store : ""
+	lambda_s3_folder            = var.artifact != null ? var.artifact.path : ""
+	lambda_image_uri            = var.lambda_image_uri != null ? var.lambda_image_uri : ""
   }
 }
 
