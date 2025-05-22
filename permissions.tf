@@ -4,7 +4,9 @@ data "aws_iam_policy_document" "allow_ecr_image_access" {
 
 	actions = [
 	  "ecr:BatchGetImage",
-	  "ecr:GetDownloadUrlForLayer"
+	  "ecr:GetDownloadUrlForLayer",
+	  "ecr:BatchCheckLayerAvailability",
+	  "ecr:GetAuthorizationToken",
 	]
 	resources = ["*"]
   }
