@@ -31,7 +31,7 @@ resource "aws_iam_role_policy_attachment" "codedeploy_deployment_lambda" {
 
 resource "aws_codedeploy_app" "this" {
   compute_platform = "Lambda"
-  name             = "${var.function_name}-lambda"
+  name             = var.function_name
 }
 
 resource "aws_codedeploy_deployment_group" "this" {

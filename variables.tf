@@ -17,6 +17,13 @@ variable "description" {
   default     = null
 }
 
+variable "ecr_repository_url" {
+  description = "Repository url for the ECR image"
+  type        = string
+
+  default = null
+}
+
 variable "artifact_type" {
   description = "The type of artifact to deploy"
 
@@ -40,19 +47,21 @@ variable "architecture" {
   description = "Architecture the lambda is compatible with. Valid values are \"x86_64\" or \"arm64\""
 
   type    = string
-  default = "x86_64"
+  default = "arm64"
 }
 
 variable "runtime" {
   description = "The runtime to use for the lambda function"
 
-  type = string
+  type    = string
+  default = null
 }
 
 variable "handler" {
   description = "The handler to use for the lambda function"
 
-  type = string
+  type    = string
+  default = null
 }
 
 variable "timeout" {
@@ -234,11 +243,4 @@ variable "rollback_window_in_minutes" {
   description = "The rollback window in minutes"
   type        = number
   default     = 0
-}
-
-variable "ecr_repository_url" {
-  description = "Repository url for the ECR image"
-  type        = string
-
-  default     = null
 }

@@ -49,7 +49,7 @@ locals {
     x86_64 = "",
     arm64  = "-ARM"
   }
-  runtime_base = regex("[a-z]+", var.runtime)
+  runtime_base = var.runtime != null ? regex("[a-z]+", var.runtime) : ""
   runtime_base_environment_variable_map = {
     java = {
       AWS_LAMBDA_EXEC_WRAPPER = "/opt/datadog_wrapper"
@@ -96,7 +96,7 @@ locals {
   datadog_lambda_layer_arn    = "${local.datadog_layer_name_base}:${local.datadog_lambda_layer_runtime}${local.datadog_lambda_layer_suffix}:${local.datadog_lambda_layer_version}"
   datadog_lambda_layer_suffix = contains(["java", "nodejs"], local.runtime_base) ? "" : local.datadog_layer_suffix
   # java and nodejs don't have separate layers for ARM
-  datadog_lambda_layer_runtime = lookup(local.runtime_layer_map, var.runtime, "")
+  datadog_lambda_layer_runtime = lookup(local.runtime_layer_map, var.runtime != null ? var.runtime : "", "")
   datadog_lambda_layer_version = lookup(local.runtime_base_layer_version_map, local.runtime_base, "")
 
   datadog_account_id      = "464622532012"
