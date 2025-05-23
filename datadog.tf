@@ -127,7 +127,7 @@ locals {
       DD_SERVICE                                        = var.service_name
       DD_ENV                                            = local.environment
       DD_SERVICE_MAPPING                                = "lambda_api_gateway:aws.apigw.${var.service_name},lambda_sns:aws.sns.${var.service_name},lambda_sqs:aws.sqs.${var.service_name},lambda_s3:aws.s3.${var.service_name},lambda_dynamodb:aws.dynamodb.${var.service_name},eventbridge.custom.event.sender:aws.eventbridge.${var.service_name},MyStream:aws.kinesis.${var.service_name}"
-      DD_VERSION                                        = var.artifact != null ? var.artifact.version : data.aws_ssm_parameter.deployment_version.value
+      DD_VERSION                                        = var.artifact != null ? var.artifact.version : aws_ssm_parameter.deployment_version.value
       DD_API_KEY_SECRET_ARN                             = data.aws_secretsmanager_secret.datadog_api_key.arn
       DD_SITE                                           = "datadoghq.eu"
       DD_TRACE_ENABLED                                  = "true"

@@ -22,8 +22,17 @@ resource "aws_iam_role" "this" {
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 }
 
-data "aws_ssm_parameter" "deployment_version" {
-  name = "/__platform__/versions/${var.service_name}"
+resource "aws_ssm_parameter" "deployment_version" {
+  # This parameter is used to initially store the version of the Lambda function. Will be overwritten
+  name      = "/__platform__/versions/${var.service_name}"
+  type      = "String"
+  value     = "latest"
+
+  lifecycle {
+	ignore_changes = [
+	  value
+	]
+  }
 }
 
 resource "aws_lambda_function" "this" {
@@ -35,7 +44,7 @@ resource "aws_lambda_function" "this" {
   s3_bucket         = var.artifact_type == "s3" ? var.artifact.store : null
   s3_key            = var.artifact_type == "s3" ? var.artifact.path : null
   s3_object_version = var.artifact_type == "s3" ? var.artifact.version : null
-  image_uri         = var.artifact_type == "ecr" ? "${var.ecr_repository_url}:${data.aws_ssm_parameter.deployment_version.value}" : null
+  image_uri         = var.artifact_type == "ecr" ? "${var.ecr_repository_url}:${aws_ssm_parameter.deployment_version.value}" : null
 
   timeout = var.timeout
 
