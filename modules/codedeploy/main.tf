@@ -57,14 +57,16 @@ locals {
 	codedeploy_deployment_group = aws_codedeploy_deployment_group.this.deployment_group_name
 	codedeploy_application_name = aws_codedeploy_app.this.name
 	lambda_function_name        = var.function_name
-	lambda_s3_bucket            = var.artifact != null ? var.artifact.store : ""
-	lambda_s3_folder            = var.artifact != null ? var.artifact.path : ""
-	lambda_image_uri            = var.lambda_image_uri != null ? var.lambda_image_uri : ""
+	lambda_s3_bucket            = var.artifact != null ? var.artifact.store : null
+	lambda_s3_folder            = var.artifact != null ? var.artifact.path : null
+	lambda_image_uri            = nonsensitive(var.lambda_image_uri)
   }
 }
 
 resource "aws_ssm_parameter" "ssm_parameters" {
-  for_each = local.ssm_parameters
+  for_each = {
+	for k, v in local.ssm_parameters : k => v if v != null
+  }
 
   name  = "/__deployment__/applications/${var.function_name}/${each.key}"
   type  = "String"
