@@ -91,6 +91,15 @@ resource "aws_lambda_function" "this" {
   environment {
     variables = var.enable_datadog ? merge(var.environment_variables, local.environment_variables.common, local.environment_variables.runtime) : var.environment_variables
   }
+
+  lifecycle {
+	# Code deploy handles this
+	ignore_changes = [
+	  qualified_arn,
+	  version,
+	  qualified_invoke_arn
+	]
+  }
 }
 
 data "aws_iam_policy_document" "vpc_access_permissions" {
@@ -342,8 +351,9 @@ data "aws_iam_policy_document" "allow_scheduler_to_run_lambda" {
     ]
 
     resources = [
-      aws_lambda_function.this.qualified_arn
-    ]
+	  aws_lambda_alias.this.arn,
+	  "${aws_lambda_function.this.function_name}:*"
+	]
   }
 }
 
