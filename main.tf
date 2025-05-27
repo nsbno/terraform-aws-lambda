@@ -49,7 +49,9 @@ resource "aws_lambda_function" "this" {
   timeout = var.timeout
 
   runtime = var.artifact_type == "s3" ? var.runtime : null
-  handler = var.enable_datadog ? local.handler : var.handler
+  handler = var.artifact_type == "ecr" ? null : (
+    var.enable_datadog ? local.handler : var.handler
+  )
 
   architectures = [var.architecture]
 
