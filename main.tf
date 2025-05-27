@@ -49,7 +49,7 @@ resource "aws_lambda_function" "this" {
   timeout = var.timeout
 
   runtime = var.artifact_type == "s3" ? var.runtime : null
-  handler = var.artifact_type == "s3" && var.enable_datadog ? local.handler : var.handler
+  handler = var.enable_datadog ? local.handler : var.handler
 
   architectures = [var.architecture]
 
@@ -88,8 +88,12 @@ resource "aws_lambda_function" "this" {
     log_group  = local.log_group_name
   }
 
-  image_config {
-	command = [var.artifact_type == "ecr" && var.enable_datadog ? local.handler : null]
+  dynamic "image_config" {
+	for_each = var.artifact_type == "ecr" && var.enable_datadog ? [{}] : []
+
+	content {
+	  command = [local.handler]
+	}
   }
 
   environment {
