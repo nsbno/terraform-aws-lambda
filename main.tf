@@ -57,10 +57,12 @@ resource "aws_lambda_function" "this" {
 
   role = aws_iam_role.this.arn
 
-  layers = var.enable_insights ? concat(
-    local.lambda_layers,
-    ["arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension:33"]
-  ) : local.lambda_layers
+  layers = var.artifact_type == "ecr" ? null : (
+    var.enable_insights ? concat(
+      local.lambda_layers,
+      ["arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension:33"]
+    ) : local.lambda_layers
+  )
 
   publish = true
 
@@ -89,11 +91,11 @@ resource "aws_lambda_function" "this" {
   }
 
   dynamic "image_config" {
-	for_each = var.artifact_type == "ecr" && var.enable_datadog ? [{}] : []
+    for_each = var.artifact_type == "ecr" && var.enable_datadog ? [{}] : []
 
-	content {
-	  command = [local.handler]
-	}
+    content {
+      command = [local.handler]
+    }
   }
 
   environment {
@@ -101,12 +103,12 @@ resource "aws_lambda_function" "this" {
   }
 
   lifecycle {
-	# Code deploy handles this
-	ignore_changes = [
-	  qualified_arn,
-	  version,
-	  qualified_invoke_arn
-	]
+    # Code deploy handles this
+    ignore_changes = [
+      qualified_arn,
+      version,
+      qualified_invoke_arn
+    ]
   }
 }
 
@@ -359,9 +361,9 @@ data "aws_iam_policy_document" "allow_scheduler_to_run_lambda" {
     ]
 
     resources = [
-	  aws_lambda_alias.this.arn,
-	  "${aws_lambda_function.this.function_name}:*"
-	]
+      aws_lambda_alias.this.arn,
+      "${aws_lambda_function.this.function_name}:*"
+    ]
   }
 }
 
