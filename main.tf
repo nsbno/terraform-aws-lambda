@@ -111,8 +111,6 @@ resource "aws_lambda_function" "this" {
       version,
       qualified_invoke_arn,
 	  image_uri,
-	  # This specifically targets the DD_VERSION variable as it is handled by the Deployment Pipeline
-	  environment[0].variables["DD_VERSION"]
     ]
 
   }
