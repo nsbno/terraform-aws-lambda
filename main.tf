@@ -406,7 +406,7 @@ module "codedeploy" {
   function_name         = local.function_name
   artifact              = var.artifact
   deployment_group_name = "${local.function_name}-deployment-group"
-  lambda_image_uri      = aws_lambda_function.this.image_uri
+  lambda_ecr_image_base = var.ecr_repository_url
 
   rollback_window_in_minutes = var.rollback_window_in_minutes
 }

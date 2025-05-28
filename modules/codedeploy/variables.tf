@@ -1,10 +1,10 @@
 variable "function_name" {
-  description = "The name of the lambda function"
+  description = "The name of the Lambda function"
   type        = string
 }
 
-variable "lambda_image_uri" {
-  description = "The URI of the lambda image"
+variable "lambda_ecr_image_base" {
+  description = "The ECR Image Base of the Lambda image"
   type        = string
 }
 

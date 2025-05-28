@@ -1,14 +1,14 @@
 ## Code Deploy role
 data "aws_iam_policy_document" "assume_role_code_deploy" {
   statement {
-	effect = "Allow"
+    effect = "Allow"
 
-	principals {
-	  type        = "Service"
-	  identifiers = ["codedeploy.amazonaws.com"]
-	}
+    principals {
+      type        = "Service"
+      identifiers = ["codedeploy.amazonaws.com"]
+    }
 
-	actions = ["sts:AssumeRole"]
+    actions = ["sts:AssumeRole"]
   }
 }
 
@@ -41,31 +41,31 @@ resource "aws_codedeploy_deployment_group" "this" {
   service_role_arn       = aws_iam_role.codedeploy_role.arn
 
   auto_rollback_configuration {
-	enabled = true
-	events  = ["DEPLOYMENT_FAILURE"]
+    enabled = true
+    events  = ["DEPLOYMENT_FAILURE"]
   }
 
   deployment_style {
-	deployment_option = "WITH_TRAFFIC_CONTROL"
-	deployment_type   = "BLUE_GREEN"
+    deployment_option = "WITH_TRAFFIC_CONTROL"
+    deployment_type   = "BLUE_GREEN"
   }
 }
 
 locals {
   ssm_parameters = {
-	compute_target              = "lambda"
-	codedeploy_deployment_group = aws_codedeploy_deployment_group.this.deployment_group_name
-	codedeploy_application_name = aws_codedeploy_app.this.name
-	lambda_function_name        = var.function_name
-	lambda_s3_bucket            = var.artifact != null ? var.artifact.store : null
-	lambda_s3_folder            = var.artifact != null ? var.artifact.path : null
-	lambda_image_uri            = nonsensitive(var.lambda_image_uri)
+    compute_target              = "lambda"
+    codedeploy_deployment_group = aws_codedeploy_deployment_group.this.deployment_group_name
+    codedeploy_application_name = aws_codedeploy_app.this.name
+    lambda_function_name        = var.function_name
+    lambda_s3_bucket            = var.artifact != null ? var.artifact.store : null
+    lambda_s3_folder            = var.artifact != null ? var.artifact.path : null
+    lambda_ecr_image_base       = var.lambda_ecr_image_base
   }
 }
 
 resource "aws_ssm_parameter" "ssm_parameters" {
   for_each = {
-	for k, v in local.ssm_parameters : k => v if v != null
+    for k, v in local.ssm_parameters : k => v if v != null
   }
 
   name  = "/__deployment__/applications/${var.function_name}/${each.key}"
