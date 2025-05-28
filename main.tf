@@ -24,7 +24,7 @@ resource "aws_iam_role" "this" {
 
 resource "aws_ssm_parameter" "deployment_version" {
   # This parameter is used to initially store the version of the Lambda function. Will be overwritten
-  name  = "/__platform__/versions/${var.service_name}"
+  name  = "/__platform__/versions/${local.function_name}"
   type  = "String"
   value = "latest"
 
@@ -112,7 +112,6 @@ resource "aws_lambda_function" "this" {
       qualified_invoke_arn,
       image_uri,
     ]
-
   }
 }
 
