@@ -133,6 +133,8 @@ locals {
       DD_TRACE_ENABLED                                  = "true"
       DD_TAGS                                           = local.combined_tags
       DD_TRACE_REMOVE_INTEGRATION_SERVICE_NAMES_ENABLED = "true"
+      DD_TRACE_OTEL_ENABLED                             = "false"
+      DD_SERVERLESS_APPSEC_ENABLED                      = "false"
     }
     runtime = lookup(local.runtime_base_environment_variable_map, local.runtime_base, {})
   }
