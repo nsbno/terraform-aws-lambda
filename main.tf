@@ -110,7 +110,7 @@ resource "aws_lambda_function" "this" {
       qualified_arn,
       version,
       qualified_invoke_arn,
-	  image_uri,
+      image_uri,
     ]
 
   }
@@ -153,7 +153,7 @@ resource "aws_lambda_alias" "this" {
   function_version = aws_lambda_function.this.version
 
   lifecycle {
-	ignore_changes = [function_version]
+    ignore_changes = [function_version]
   }
 }
 
@@ -370,8 +370,8 @@ data "aws_iam_policy_document" "allow_scheduler_to_run_lambda" {
 
     resources = [
       aws_lambda_alias.this.arn,
-	  aws_lambda_function.this.arn,
-	  "${aws_lambda_function.this.arn}:*"
+      aws_lambda_function.this.arn,
+      "${aws_lambda_function.this.arn}:*"
     ]
   }
 }
