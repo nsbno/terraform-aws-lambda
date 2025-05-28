@@ -66,7 +66,7 @@ resource "aws_lambda_function" "this" {
     ) : local.lambda_layers
   )
 
-  publish = true
+  publish = var.publish
 
   reserved_concurrent_executions = var.reserved_concurrent_executions
 
@@ -109,8 +109,12 @@ resource "aws_lambda_function" "this" {
     ignore_changes = [
       qualified_arn,
       version,
-      qualified_invoke_arn
+      qualified_invoke_arn,
+	  image_uri,
+	  # This specifically targets the DD_VERSION variable as it is handled by the Deployment Pipeline
+	  environment[0].variables["DD_VERSION"]
     ]
+
   }
 }
 
@@ -149,6 +153,10 @@ resource "aws_lambda_alias" "this" {
 
   function_name    = aws_lambda_function.this.function_name
   function_version = aws_lambda_function.this.version
+
+  lifecycle {
+	ignore_changes = [function_version]
+  }
 }
 
 resource "aws_cloudwatch_log_group" "this" {
@@ -364,7 +372,8 @@ data "aws_iam_policy_document" "allow_scheduler_to_run_lambda" {
 
     resources = [
       aws_lambda_alias.this.arn,
-      "${aws_lambda_function.this.function_name}:*"
+	  aws_lambda_function.this.arn,
+	  "${aws_lambda_function.this.arn}:*"
     ]
   }
 }

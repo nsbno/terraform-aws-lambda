@@ -245,3 +245,9 @@ variable "rollback_window_in_minutes" {
   type        = number
   default     = 0
 }
+
+variable "publish" {
+  description = "Publish the Lambda function version after deployment"
+  type    = bool
+  default = false
+}
