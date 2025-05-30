@@ -28,7 +28,7 @@ resource "aws_ssm_parameter" "deployment_version" {
   type  = "String"
   value = "latest"
 
-  overwrite = True
+  overwrite = true
 
   lifecycle {
     ignore_changes = [
