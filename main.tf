@@ -9,7 +9,10 @@ data "aws_iam_policy_document" "assume_role_policy" {
 
     principals {
       type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
+      identifiers = [
+		"edgelambda.amazonaws.com",
+		"lambda.amazonaws.com"
+	  ]
     }
 
     actions = ["sts:AssumeRole"]
