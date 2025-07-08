@@ -10,6 +10,8 @@ data "aws_ssm_parameter" "team_name" {
 }
 
 data "aws_secretsmanager_secret" "datadog_api_key" {
+  count = var.enable_datadog ? 1 : 0
+
   arn = "arn:aws:secretsmanager:eu-west-1:727646359971:secret:datadog_agent_api_key"
 }
 
@@ -22,7 +24,7 @@ data "aws_iam_policy_document" "secrets_manager" {
     ]
 
     resources = [
-      data.aws_secretsmanager_secret.datadog_api_key.arn,
+      var.enable_datadog ? data.aws_secretsmanager_secret.datadog_api_key[0].arn : "",
     ]
   }
   statement {
@@ -39,6 +41,8 @@ data "aws_iam_policy_document" "secrets_manager" {
 }
 
 resource "aws_iam_role_policy" "secrets_manager" {
+  count = var.enable_datadog ? 1 : 0
+
   role   = aws_iam_role.this.id
   policy = data.aws_iam_policy_document.secrets_manager.json
 }
@@ -128,7 +132,7 @@ locals {
       DD_ENV                                            = local.environment
       DD_SERVICE_MAPPING                                = "lambda_api_gateway:aws.apigw.${var.service_name},lambda_sns:aws.sns.${var.service_name},lambda_sqs:aws.sqs.${var.service_name},lambda_s3:aws.s3.${var.service_name},lambda_dynamodb:aws.dynamodb.${var.service_name},eventbridge.custom.event.sender:aws.eventbridge.${var.service_name},MyStream:aws.kinesis.${var.service_name}"
       DD_VERSION                                        = var.artifact != null ? var.artifact.version : nonsensitive(aws_ssm_parameter.deployment_version.value)
-      DD_API_KEY_SECRET_ARN                             = data.aws_secretsmanager_secret.datadog_api_key.arn
+      DD_API_KEY_SECRET_ARN                             = var.enable_datadog ? data.aws_secretsmanager_secret.datadog_api_key[0].arn : null
       DD_SITE                                           = "datadoghq.eu"
       DD_TRACE_ENABLED                                  = "true"
       DD_TAGS                                           = local.combined_tags
