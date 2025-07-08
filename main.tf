@@ -116,6 +116,7 @@ resource "aws_lambda_function" "this" {
       version,
       qualified_invoke_arn,
       image_uri,
+	  s3_object_version
     ]
   }
 }
