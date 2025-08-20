@@ -113,7 +113,7 @@ resource "aws_lambda_function" "this" {
       version,
       qualified_invoke_arn,
       image_uri,
-	  s3_object_version
+      s3_object_version
     ]
   }
 }
@@ -406,17 +406,17 @@ resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
  */
 locals {
   ssm_parameters = {
-	compute_target              = "lambda"
-	lambda_function_name        = local.function_name
-	lambda_s3_bucket            = var.artifact != null ? var.artifact.store : null
-	lambda_s3_folder            = var.artifact != null ? var.artifact.path : null
-	lambda_ecr_image_base       = var.ecr_repository_url
+    compute_target        = "lambda"
+    lambda_function_name  = local.function_name
+    lambda_s3_bucket      = var.artifact != null ? var.artifact.store : null
+    lambda_s3_folder      = var.artifact != null ? var.artifact.path : null
+    lambda_ecr_image_base = var.ecr_repository_url
   }
 }
 
 resource "aws_ssm_parameter" "ssm_parameters" {
   for_each = {
-	for k, v in local.ssm_parameters : k => v if v != null
+    for k, v in local.ssm_parameters : k => v if v != null
   }
 
   name  = "/__deployment__/applications/${local.function_name}/${each.key}"
