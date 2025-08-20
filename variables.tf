@@ -238,16 +238,8 @@ variable "datadog_profiling_enabled" {
   default     = false
 }
 
-# CODEDEPLOY
-
-variable "rollback_window_in_minutes" {
-  description = "The rollback window in minutes"
-  type        = number
-  default     = 0
-}
-
 variable "publish" {
-  description = "Publish the Lambda function version after deployment"
+  description = "Publish the Lambda function version"
   type        = bool
   default     = false
 }
