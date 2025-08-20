@@ -107,7 +107,7 @@ resource "aws_lambda_function" "this" {
   }
 
   lifecycle {
-    # Code deploy handles this
+    # Pipeline handles this
     ignore_changes = [
       qualified_arn,
       version,
@@ -400,13 +400,26 @@ resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
   }
 }
 
-module "codedeploy" {
-  source = "./modules/codedeploy"
 
-  function_name         = local.function_name
-  artifact              = var.artifact
-  deployment_group_name = "${local.function_name}-deployment-group"
-  lambda_ecr_image_base = var.ecr_repository_url
+/*
+* == SSM Parameters for the Deployment Pipeline
+ */
+locals {
+  ssm_parameters = {
+	compute_target              = "lambda"
+	lambda_function_name        = local.function_name
+	lambda_s3_bucket            = var.artifact != null ? var.artifact.store : null
+	lambda_s3_folder            = var.artifact != null ? var.artifact.path : null
+	lambda_ecr_image_base       = var.ecr_repository_url
+  }
+}
 
-  rollback_window_in_minutes = var.rollback_window_in_minutes
+resource "aws_ssm_parameter" "ssm_parameters" {
+  for_each = {
+	for k, v in local.ssm_parameters : k => v if v != null
+  }
+
+  name  = "/__deployment__/applications/${local.function_name}/${each.key}"
+  type  = "String"
+  value = each.value
 }
