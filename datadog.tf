@@ -123,7 +123,7 @@ locals {
     common = {
       DD_CAPTURE_LAMBDA_PAYLOAD                         = "false"
       DD_LOGS_INJECTION                                 = "false"
-      DD_MERGE_XRAY_TRACES                              = "true"
+      DD_MERGE_XRAY_TRACES                              = "false"
       DD_SERVERLESS_LOGS_ENABLED                        = "true"
       DD_LOGS_CONFIG_PROCESSING_RULES                   = "[{ \"type\" : \"exclude_at_match\", \"name\" :\"exclude_start_and_end_logs\", \"pattern\" : \"(START|END|REPORT) RequestId\" }]"
       DD_PROFILING_ENABLED                              = var.datadog_profiling_enabled
@@ -131,7 +131,6 @@ locals {
       DD_SERVICE                                        = var.service_name
       DD_ENV                                            = local.environment
       DD_SERVICE_MAPPING                                = "lambda_api_gateway:aws.apigw.${var.service_name},lambda_sns:aws.sns.${var.service_name},lambda_sqs:aws.sqs.${var.service_name},lambda_s3:aws.s3.${var.service_name},lambda_dynamodb:aws.dynamodb.${var.service_name},eventbridge.custom.event.sender:aws.eventbridge.${var.service_name},MyStream:aws.kinesis.${var.service_name}"
-      DD_VERSION                                        = var.artifact != null ? var.artifact.version : nonsensitive(aws_ssm_parameter.deployment_version.value)
       DD_API_KEY_SECRET_ARN                             = var.enable_datadog ? data.aws_secretsmanager_secret.datadog_api_key[0].arn : null
       DD_SITE                                           = "datadoghq.eu"
       DD_TRACE_ENABLED                                  = "true"
