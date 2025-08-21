@@ -211,31 +211,48 @@ variable "custom_datadog_tags" {
 variable "datadog_extension_layer_version" {
   description = "Version for the Datadog Extension Layer"
   type        = number
-  default     = 78
+  default     = 84
 }
 
 variable "datadog_java_layer_version" {
   description = "Version for the Datadog Java Layer"
   type        = number
-  default     = 21
+  default     = 24
 }
 
 variable "datadog_node_layer_version" {
   description = "Version for the Datadog Node Layer"
   type        = number
-  default     = 124
+  default     = 127
 }
 
 variable "datadog_python_layer_version" {
   description = "Version for the Datadog Python Layer"
   type        = number
-  default     = 109
+  default     = 113
 }
 
 variable "datadog_profiling_enabled" {
   description = "Enable Datadog profiling"
   type        = bool
   default     = false
+}
+
+variable "datadog_api_key_secret_arn" {
+  description = "ARN of the Datadog API Key secret in AWS Secrets Manager"
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.datadog_api_key_secret_arn == null || can(regex("^arn:aws:secretsmanager:[a-z0-9-]+:[0-9]{12}:secret:[a-zA-Z0-9/_+=.@-]+$", var.datadog_api_key_secret_arn))
+    error_message = "Datadog API Key must be a valid ARN of a secret in AWS Secrets Manager."
+  }
+}
+
+variable "team_name_override" {
+  description = "Override the team name tag for Datadog. If set, this will override the value from the SSM parameter."
+  type        = string
+  default     = null
 }
 
 variable "publish" {
