@@ -37,6 +37,12 @@ resource "aws_ssm_parameter" "deployment_version" {
   }
 }
 
+data "aws_ssm_parameter" "deployment_version" {
+  name = "/__platform__/versions/${local.function_name}"
+
+  depends_on = [aws_ssm_parameter.deployment_version]
+}
+
 resource "aws_lambda_function" "this" {
   function_name = local.function_name
   description   = var.description
@@ -46,7 +52,7 @@ resource "aws_lambda_function" "this" {
   s3_bucket         = var.artifact_type == "s3" ? var.artifact.store : null
   s3_key            = var.artifact_type == "s3" ? var.artifact.path : null
   s3_object_version = var.artifact_type == "s3" ? var.artifact.version : null
-  image_uri         = var.artifact_type == "ecr" ? "${var.ecr_repository_url}:${aws_ssm_parameter.deployment_version.value}" : null
+  image_uri         = var.artifact_type == "ecr" ? "${var.ecr_repository_url}:${data.aws_ssm_parameter.deployment_version.value}" : null
 
   timeout = var.timeout
 
