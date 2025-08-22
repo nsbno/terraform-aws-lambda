@@ -133,8 +133,8 @@ locals {
       DD_SITE                                           = "datadoghq.eu"
       DD_TRACE_ENABLED                                  = "true"
       DD_TAGS                                           = local.combined_tags
-	  DD_VERSION                                        = data.aws_ssm_parameter.deployment_version.value
-	  DD_GIT_COMMIT_SHA									= data.aws_ssm_parameter.deployment_version.value
+	  DD_VERSION                                        = nonsensitive(data.aws_ssm_parameter.deployment_version.value)
+	  DD_GIT_COMMIT_SHA									= nonsensitive(data.aws_ssm_parameter.deployment_version.value)
       DD_TRACE_REMOVE_INTEGRATION_SERVICE_NAMES_ENABLED = "true"
       DD_TRACE_OTEL_ENABLED                             = "false"
       DD_SERVERLESS_APPSEC_ENABLED                      = "false"
