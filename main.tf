@@ -416,7 +416,6 @@ locals {
     lambda_function_name = local.function_name
     # deployment pipeline module in all accounts create a service folder with suffix deployment-delivery-pipeline-artifacts
     lambda_s3_bucket      = var.service_account_id != null ? "${var.service_account_id}-deployment-delivery-pipeline-artifacts" : (var.artifact != null ? var.artifact.store : null)
-    lambda_s3_folder      = var.artifact != null ? var.artifact.path : null
     lambda_ecr_image_base = var.ecr_repository_url
   }
 }
