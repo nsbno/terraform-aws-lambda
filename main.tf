@@ -412,9 +412,10 @@ resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
  */
 locals {
   ssm_parameters = {
-    compute_target        = "lambda"
-    lambda_function_name  = local.function_name
-    lambda_s3_bucket      = var.artifact != null ? var.artifact.store : null
+    compute_target       = "lambda"
+    lambda_function_name = local.function_name
+    # deployment pipeline module in all accounts create a service folder with suffix deployment-delivery-pipeline-artifacts
+    lambda_s3_bucket      = var.service_account_id != null ? "${var.service_account_id}-deployment-delivery-pipeline-artifacts" : (var.artifact != null ? var.artifact.store : null)
     lambda_s3_folder      = var.artifact != null ? var.artifact.path : null
     lambda_ecr_image_base = var.ecr_repository_url
   }

@@ -11,6 +11,13 @@ variable "component_name" {
   type    = string
 }
 
+variable "service_account_id" {
+  description = "The AWS account ID where the service is built to"
+
+  type    = string
+  default = null
+}
+
 variable "description" {
   description = "The description of the Lambda function"
   type        = string
