@@ -39,6 +39,8 @@ data "aws_iam_policy_document" "secrets_manager" {
 }
 
 resource "aws_iam_role_policy" "secrets_manager" {
+  count = var.enable_datadog ? 1 : 0
+
   role   = aws_iam_role.this.id
   policy = data.aws_iam_policy_document.secrets_manager.json
 }
@@ -49,7 +51,7 @@ locals {
     x86_64 = "",
     arm64  = "-ARM"
   }
-  runtime_base = regex("[a-z]+", var.runtime)
+  runtime_base = var.runtime != null ? regex("[a-z]+", var.runtime) : ""
   runtime_base_environment_variable_map = {
     java = {
       AWS_LAMBDA_EXEC_WRAPPER = "/opt/datadog_wrapper"
@@ -96,7 +98,7 @@ locals {
   datadog_lambda_layer_arn    = "${local.datadog_layer_name_base}:${local.datadog_lambda_layer_runtime}${local.datadog_lambda_layer_suffix}:${local.datadog_lambda_layer_version}"
   datadog_lambda_layer_suffix = contains(["java", "nodejs"], local.runtime_base) ? "" : local.datadog_layer_suffix
   # java and nodejs don't have separate layers for ARM
-  datadog_lambda_layer_runtime = lookup(local.runtime_layer_map, var.runtime, "")
+  datadog_lambda_layer_runtime = lookup(local.runtime_layer_map, var.runtime != null ? var.runtime : "", "")
   datadog_lambda_layer_version = lookup(local.runtime_base_layer_version_map, local.runtime_base, "")
 
   datadog_account_id      = "464622532012"
@@ -127,12 +129,15 @@ locals {
       DD_SERVICE                                        = var.service_name
       DD_ENV                                            = local.environment
       DD_SERVICE_MAPPING                                = "lambda_api_gateway:aws.apigw.${var.service_name},lambda_sns:aws.sns.${var.service_name},lambda_sqs:aws.sqs.${var.service_name},lambda_s3:aws.s3.${var.service_name},lambda_dynamodb:aws.dynamodb.${var.service_name},eventbridge.custom.event.sender:aws.eventbridge.${var.service_name},MyStream:aws.kinesis.${var.service_name}"
-      DD_VERSION                                        = var.artifact.version
       DD_API_KEY_SECRET_ARN                             = var.datadog_api_key_secret_arn != null ? var.datadog_api_key_secret_arn : data.aws_secretsmanager_secret.datadog_api_key.arn
       DD_SITE                                           = "datadoghq.eu"
       DD_TRACE_ENABLED                                  = "true"
       DD_TAGS                                           = local.combined_tags
+      DD_VERSION                                        = nonsensitive(data.aws_ssm_parameter.deployment_version.value)
+      DD_GIT_COMMIT_SHA                                 = nonsensitive(data.aws_ssm_parameter.deployment_version.value)
       DD_TRACE_REMOVE_INTEGRATION_SERVICE_NAMES_ENABLED = "true"
+      DD_TRACE_OTEL_ENABLED                             = "false"
+      DD_SERVERLESS_APPSEC_ENABLED                      = "false"
     }
     runtime = lookup(local.runtime_base_environment_variable_map, local.runtime_base, {})
   }

@@ -22,6 +22,27 @@ resource "aws_iam_role" "this" {
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 }
 
+resource "aws_ssm_parameter" "deployment_version" {
+  # This parameter is used to initially store the version of the Lambda function. Will be overwritten
+  name  = "/__platform__/versions/${local.function_name}"
+  type  = "String"
+  value = "latest"
+
+  overwrite = true
+
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+}
+
+data "aws_ssm_parameter" "deployment_version" {
+  name = "/__platform__/versions/${local.function_name}"
+
+  depends_on = [aws_ssm_parameter.deployment_version]
+}
+
 resource "aws_lambda_function" "this" {
   function_name = local.function_name
   description   = var.description
@@ -31,12 +52,14 @@ resource "aws_lambda_function" "this" {
   s3_bucket         = var.artifact_type == "s3" ? var.artifact.store : null
   s3_key            = var.artifact_type == "s3" ? var.artifact.path : null
   s3_object_version = var.artifact_type == "s3" ? var.artifact.version : null
-  image_uri         = var.artifact_type == "ecr" ? "${var.artifact.store}/${var.artifact.path}@${var.artifact.version}" : null
+  image_uri         = var.artifact_type == "ecr" ? "${var.ecr_repository_url}:${data.aws_ssm_parameter.deployment_version.value}" : null
 
   timeout = var.timeout
 
   runtime = var.artifact_type == "s3" ? var.runtime : null
-  handler = var.enable_datadog ? local.handler : var.handler
+  handler = var.artifact_type == "ecr" ? null : (
+    var.enable_datadog ? local.handler : var.handler
+  )
 
   architectures = [var.architecture]
 
@@ -44,12 +67,14 @@ resource "aws_lambda_function" "this" {
 
   role = aws_iam_role.this.arn
 
-  layers = var.enable_insights ? concat(
-    local.lambda_layers,
-    ["arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension:33"]
-  ) : local.lambda_layers
+  layers = var.artifact_type == "ecr" ? null : (
+    var.enable_insights ? concat(
+      local.lambda_layers,
+      ["arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension:33"]
+    ) : local.lambda_layers
+  )
 
-  publish = true
+  publish = var.publish
 
   reserved_concurrent_executions = var.reserved_concurrent_executions
 
@@ -75,8 +100,27 @@ resource "aws_lambda_function" "this" {
     log_group  = local.log_group_name
   }
 
+  dynamic "image_config" {
+    for_each = var.artifact_type == "ecr" && var.enable_datadog ? [{}] : []
+
+    content {
+      command = [local.handler]
+    }
+  }
+
   environment {
     variables = var.enable_datadog ? merge(var.environment_variables, local.environment_variables.common, local.environment_variables.runtime) : var.environment_variables
+  }
+
+  lifecycle {
+    # Pipeline handles this
+    ignore_changes = [
+      qualified_arn,
+      version,
+      qualified_invoke_arn,
+      image_uri,
+      s3_object_version
+    ]
   }
 }
 
@@ -115,6 +159,10 @@ resource "aws_lambda_alias" "this" {
 
   function_name    = aws_lambda_function.this.function_name
   function_version = aws_lambda_function.this.version
+
+  lifecycle {
+    ignore_changes = [function_version]
+  }
 }
 
 resource "aws_cloudwatch_log_group" "this" {
@@ -329,7 +377,9 @@ data "aws_iam_policy_document" "allow_scheduler_to_run_lambda" {
     ]
 
     resources = [
-      aws_lambda_function.this.qualified_arn
+      aws_lambda_alias.this.arn,
+      aws_lambda_function.this.arn,
+      "${aws_lambda_function.this.arn}:*"
     ]
   }
 }
@@ -354,4 +404,28 @@ resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
       level = "$.level"
     }
   }
+}
+
+
+/*
+* == SSM Parameters for the Deployment Pipeline
+ */
+locals {
+  ssm_parameters = {
+    compute_target        = "lambda"
+    lambda_function_name  = local.function_name
+    lambda_s3_bucket      = var.artifact != null ? var.artifact.store : null
+    lambda_s3_folder      = var.artifact != null ? var.artifact.path : null
+    lambda_ecr_image_base = var.ecr_repository_url
+  }
+}
+
+resource "aws_ssm_parameter" "ssm_parameters" {
+  for_each = {
+    for k, v in local.ssm_parameters : k => v if v != null
+  }
+
+  name  = "/__deployment__/applications/${local.function_name}/${each.key}"
+  type  = "String"
+  value = each.value
 }

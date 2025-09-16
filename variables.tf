@@ -17,6 +17,13 @@ variable "description" {
   default     = null
 }
 
+variable "ecr_repository_url" {
+  description = "Repository url for the ECR image"
+  type        = string
+
+  default = null
+}
+
 variable "artifact_type" {
   description = "The type of artifact to deploy"
 
@@ -34,6 +41,7 @@ variable "artifact" {
     path    = string
     version = string
   })
+  default = null
 }
 
 variable "architecture" {
@@ -46,13 +54,15 @@ variable "architecture" {
 variable "runtime" {
   description = "The runtime to use for the lambda function"
 
-  type = string
+  type    = string
+  default = null
 }
 
 variable "handler" {
   description = "The handler to use for the lambda function"
 
-  type = string
+  type    = string
+  default = null
 }
 
 variable "timeout" {
@@ -243,4 +253,10 @@ variable "team_name_override" {
   description = "Override the team name tag for Datadog. If set, this will override the value from the SSM parameter."
   type        = string
   default     = null
+}
+
+variable "publish" {
+  description = "Publish the Lambda function version"
+  type        = bool
+  default     = false
 }
