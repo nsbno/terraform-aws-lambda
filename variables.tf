@@ -11,13 +11,6 @@ variable "component_name" {
   type    = string
 }
 
-variable "service_account_id" {
-  description = "The AWS account ID where the service is built to"
-
-  type    = string
-  default = null
-}
-
 variable "description" {
   description = "The description of the Lambda function"
   type        = string
@@ -48,6 +41,13 @@ variable "artifact" {
     path    = string
     version = string
   })
+  default = null
+}
+
+variable "s3_service_account_id" {
+  description = "The AWS account ID where the service is built to (for zip artifact)"
+
+  type    = string
   default = null
 }
 

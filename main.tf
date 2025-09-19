@@ -1,7 +1,7 @@
 locals {
   function_name                        = var.component_name != null ? "${var.service_name}-${var.component_name}" : var.service_name
   log_group_name                       = var.log_group_name != null ? "/aws/lambda/${var.log_group_name}" : "/aws/lambda/${local.function_name}"
-  service_account_deployment_artifacts = var.service_account_id != null ? "${var.service_account_id}-deployment-delivery-pipeline-artifacts" : null
+  service_account_deployment_artifacts = var.s3_service_account_id != null ? "${var.s3_service_account_id}-deployment-delivery-pipeline-artifacts" : null
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -50,7 +50,7 @@ resource "aws_lambda_function" "this" {
 
   package_type = var.artifact_type == "s3" ? "Zip" : "Image"
 
-  s3_bucket         = var.artifact_type == "s3" ? (var.service_account_id != null ? local.service_account_deployment_artifacts : var.artifact.store ? var.artifact.store : null) : null
+  s3_bucket         = var.artifact_type == "s3" ? (var.s3_service_account_id != null ? local.service_account_deployment_artifacts : var.artifact.store ? var.artifact.store : null) : null
   s3_key            = var.artifact_type == "s3" ? var.artifact.path : null
   s3_object_version = var.artifact_type == "s3" ? var.artifact.version : null
   image_uri         = var.artifact_type == "ecr" ? "${var.ecr_repository_url}:${data.aws_ssm_parameter.deployment_version.value}" : null
@@ -416,7 +416,7 @@ locals {
     compute_target       = "lambda"
     lambda_function_name = local.function_name
     # deployment pipeline module in all accounts create a service folder with suffix deployment-delivery-pipeline-artifacts
-    lambda_s3_bucket      = var.service_account_id != null ? local.service_account_deployment_artifacts : (var.artifact != null ? var.artifact.store : null)
+    lambda_s3_bucket      = var.s3_service_account_id != null ? local.service_account_deployment_artifacts : (var.artifact != null ? var.artifact.store : null)
     lambda_ecr_image_base = var.ecr_repository_url
   }
 }
