@@ -156,7 +156,7 @@ resource "aws_iam_role_policy" "vpc_access_permissions_attachment" {
 }
 
 resource "aws_lambda_alias" "this" {
-  name = "active"
+  name = var.alias_name
 
   function_name    = aws_lambda_function.this.function_name
   function_version = aws_lambda_function.this.version

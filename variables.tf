@@ -11,6 +11,12 @@ variable "component_name" {
   type    = string
 }
 
+variable "alias_name" {
+  description = "The name of the alias to create for the Lambda function"
+  type        = string
+  default     = "active"
+}
+
 variable "description" {
   description = "The description of the Lambda function"
   type        = string
