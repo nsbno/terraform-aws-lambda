@@ -50,6 +50,20 @@ variable "artifact" {
   default = null
 }
 
+variable "deployment_sha" {
+  description = "The git sha of the build (for zip artifact)"
+
+  type    = string
+  default = "latest"
+}
+
+variable "file_extension" {
+  description = "The file extension of the artifact (for zip artifact)"
+
+  type    = string
+  default = "zip"
+}
+
 variable "s3_service_account_id" {
   description = "The AWS account ID where the service is built to (for zip artifact)"
 
@@ -271,5 +285,5 @@ variable "team_name_override" {
 variable "publish" {
   description = "Publish the Lambda function version"
   type        = bool
-  default     = false
+  default     = true
 }
