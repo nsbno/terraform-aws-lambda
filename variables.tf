@@ -54,7 +54,7 @@ variable "deployment_sha" {
   description = "The git sha of the build (for zip artifact)"
 
   type    = string
-  default = "latest"
+  default = "main"
 }
 
 variable "file_extension" {
