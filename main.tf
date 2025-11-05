@@ -27,7 +27,7 @@ resource "aws_ssm_parameter" "deployment_version" {
   # This parameter is used to initially store the version of the Lambda function. Will be overwritten
   name  = "/__platform__/${var.github_repository_name}/${var.service_directory}/versions/${local.function_name}"
   type  = "String"
-  value = "main"
+  value = "latest"
 
   overwrite = true
 
