@@ -50,13 +50,6 @@ variable "artifact" {
   default = null
 }
 
-variable "s3_service_account_id" {
-  description = "The AWS account ID where the service is built to (for zip artifact)"
-
-  type    = string
-  default = null
-}
-
 variable "architecture" {
   description = "Architecture the lambda is compatible with. Valid values are \"x86_64\" or \"arm64\""
 
@@ -272,4 +265,15 @@ variable "publish" {
   description = "Publish the Lambda function version"
   type        = bool
   default     = false
+}
+
+variable "github_repository_name" {
+  description = "The name of the GitHub repository where the source code is hosted"
+  type        = string
+}
+
+variable "service_directory" {
+  description = "The directory where the service code is located"
+  type        = string
+  default     = "."
 }

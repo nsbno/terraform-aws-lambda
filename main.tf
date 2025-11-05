@@ -25,9 +25,9 @@ resource "aws_iam_role" "this" {
 
 resource "aws_ssm_parameter" "deployment_version" {
   # This parameter is used to initially store the version of the Lambda function. Will be overwritten
-  name  = "/__platform__/versions/${local.function_name}"
+  name  = "/__platform__/${var.github_repository_name}/${var.service_directory}/versions/${local.function_name}"
   type  = "String"
-  value = "latest"
+  value = "main"
 
   overwrite = true
 
@@ -39,9 +39,19 @@ resource "aws_ssm_parameter" "deployment_version" {
 }
 
 data "aws_ssm_parameter" "deployment_version" {
-  name = "/__platform__/versions/${local.function_name}"
+  name = "/__platform__/${var.github_repository_name}/${var.service_directory}/versions/${local.function_name}"
 
   depends_on = [aws_ssm_parameter.deployment_version]
+}
+
+data "archive_file" "s3_placeholder" {
+  type        = "zip"
+  output_path = "${path.module}/placeholder.zip"
+
+  source {
+    content  = "Placeholder. Awaiting deployment"
+    filename = "index.txt"
+  }
 }
 
 resource "aws_lambda_function" "this" {
@@ -50,10 +60,13 @@ resource "aws_lambda_function" "this" {
 
   package_type = var.artifact_type == "s3" ? "Zip" : "Image"
 
-  s3_bucket         = var.artifact_type == "s3" ? (var.s3_service_account_id != null ? local.service_account_deployment_artifacts : var.artifact.store ? var.artifact.store : null) : null
-  s3_key            = var.artifact_type == "s3" ? var.artifact.path : null
-  s3_object_version = var.artifact_type == "s3" ? var.artifact.version : null
-  image_uri         = var.artifact_type == "ecr" ? "${var.ecr_repository_url}:${data.aws_ssm_parameter.deployment_version.value}" : null
+  # s3_bucket = var.artifact_type == "s3" ? (var.s3_service_account_id != null ? local.service_account_deployment_artifacts : null) : null
+  # s3_key    = var.artifact_type == "s3" ? "${var.github_repository_name}/${var.service_directory}/${data.aws_ssm_parameter.deployment_version.value}.${var.file_extension}" : null
+  # s3_object_version = var.artifact_type == "s3" ? var.artifact.version : null
+  image_uri = var.artifact_type == "ecr" ? "${var.ecr_repository_url}:${data.aws_ssm_parameter.deployment_version.value}" : null
+
+  filename         = var.artifact_type == "s3" ? data.archive_file.s3_placeholder.output_path : null
+  source_code_hash = var.artifact_type == "s3" ? data.archive_file.s3_placeholder.output_base64sha256 : null
 
   timeout = var.timeout
 
@@ -120,7 +133,8 @@ resource "aws_lambda_function" "this" {
       version,
       qualified_invoke_arn,
       image_uri,
-      s3_object_version
+      filename,
+      source_code_hash,
     ]
   }
 }
