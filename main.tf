@@ -46,10 +46,10 @@ data "aws_ssm_parameter" "deployment_version" {
 
 data "archive_file" "s3_placeholder" {
   type        = "zip"
-  output_path = "${path.module}/placeholder.zip"
+  output_path = "${path.module}/placeholder-delete-me.zip"
 
   source {
-    content  = "Placeholder. Awaiting deployment"
+    content  = "Placeholder. Awaiting deployment from pipeline."
     filename = "index.txt"
   }
 }
