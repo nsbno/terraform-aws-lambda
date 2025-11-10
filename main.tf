@@ -388,7 +388,7 @@ resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
 * == SSM Parameters for the Deployment Pipeline
  */
 resource "aws_ssm_parameter" "lambda_version" {
-  name = "/__deployment__/${var.github_repository_name}/${var.service_directory}/lamba_version"
+  name = "/__deployment__/${var.github_repository_name}/${var.service_directory}/lambda_version"
   type = "String"
 
   value = "latest"
@@ -399,7 +399,7 @@ resource "aws_ssm_parameter" "lambda_version" {
 }
 
 data "aws_ssm_parameter" "deployment_version" {
-  name = "/__deployment__/${var.github_repository_name}/${var.service_directory}/lamba_version"
+  name = "/__deployment__/${var.github_repository_name}/${var.service_directory}/lambda_version"
 
   depends_on = [aws_ssm_parameter.lambda_version]
 }
