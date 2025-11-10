@@ -41,14 +41,20 @@ variable "artifact_type" {
   }
 }
 
-variable "artifact" {
-  type = object({
-    store   = string
-    path    = string
-    version = string
-  })
+variable "file_extension" {
+  description = "The file extension of the artifact (for zip artifact)"
+
+  type    = string
+  default = "zip"
+}
+
+variable "service_account_id" {
+  description = "The AWS account ID where the service is built to (for zip artifact)"
+
+  type    = string
   default = null
 }
+
 
 variable "architecture" {
   description = "Architecture the lambda is compatible with. Valid values are \"x86_64\" or \"arm64\""
@@ -264,7 +270,7 @@ variable "team_name_override" {
 variable "publish" {
   description = "Publish the Lambda function version"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "github_repository_name" {
@@ -275,5 +281,5 @@ variable "github_repository_name" {
 variable "service_directory" {
   description = "The directory where the service code is located"
   type        = string
-  default     = "."
+  default     = "base"
 }

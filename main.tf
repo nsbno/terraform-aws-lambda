@@ -1,7 +1,7 @@
 locals {
   function_name                        = var.component_name != null ? "${var.service_name}-${var.component_name}" : var.service_name
   log_group_name                       = var.log_group_name != null ? "/aws/lambda/${var.log_group_name}" : "/aws/lambda/${local.function_name}"
-  service_account_deployment_artifacts = var.s3_service_account_id != null ? "${var.s3_service_account_id}-deployment-delivery-pipeline-artifacts" : null
+  service_account_deployment_artifacts = var.service_account_id != null ? "${var.service_account_id}-deployment-delivery-pipeline-artifacts" : null
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -23,50 +23,15 @@ resource "aws_iam_role" "this" {
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 }
 
-resource "aws_ssm_parameter" "deployment_version" {
-  # This parameter is used to initially store the version of the Lambda function. Will be overwritten
-  name  = "/__platform__/${var.github_repository_name}/${var.service_directory}/versions/${local.function_name}"
-  type  = "String"
-  value = "latest"
-
-  overwrite = true
-
-  lifecycle {
-    ignore_changes = [
-      value
-    ]
-  }
-}
-
-data "aws_ssm_parameter" "deployment_version" {
-  name = "/__platform__/${var.github_repository_name}/${var.service_directory}/versions/${local.function_name}"
-
-  depends_on = [aws_ssm_parameter.deployment_version]
-}
-
-data "archive_file" "s3_placeholder" {
-  type        = "zip"
-  output_path = "${path.module}/placeholder-delete-me.zip"
-
-  source {
-    content  = "Placeholder. Awaiting deployment from pipeline."
-    filename = "index.txt"
-  }
-}
-
 resource "aws_lambda_function" "this" {
   function_name = local.function_name
   description   = var.description
 
   package_type = var.artifact_type == "s3" ? "Zip" : "Image"
 
-  # s3_bucket = var.artifact_type == "s3" ? (var.s3_service_account_id != null ? local.service_account_deployment_artifacts : null) : null
-  # s3_key    = var.artifact_type == "s3" ? "${var.github_repository_name}/${var.service_directory}/${data.aws_ssm_parameter.deployment_version.value}.${var.file_extension}" : null
-  # s3_object_version = var.artifact_type == "s3" ? var.artifact.version : null
+  s3_bucket = var.artifact_type == "s3" ? (var.service_account_id != null ? local.service_account_deployment_artifacts : null) : null
+  s3_key    = var.artifact_type == "s3" ? "${var.github_repository_name}/${var.service_directory}/${data.aws_ssm_parameter.deployment_version.value}.${var.file_extension}" : null
   image_uri = var.artifact_type == "ecr" ? "${var.ecr_repository_url}:${data.aws_ssm_parameter.deployment_version.value}" : null
-
-  filename         = var.artifact_type == "s3" ? data.archive_file.s3_placeholder.output_path : null
-  source_code_hash = var.artifact_type == "s3" ? data.archive_file.s3_placeholder.output_base64sha256 : null
 
   timeout = var.timeout
 
@@ -126,17 +91,14 @@ resource "aws_lambda_function" "this" {
     variables = var.enable_datadog ? merge(var.environment_variables, local.environment_variables.common, local.environment_variables.runtime) : var.environment_variables
   }
 
-  lifecycle {
-    # Pipeline handles this
-    ignore_changes = [
-      qualified_arn,
-      version,
-      qualified_invoke_arn,
-      image_uri,
-      filename,
-      source_code_hash,
-    ]
-  }
+  # lifecycle {
+  #   # Pipeline handles this
+  #   ignore_changes = [
+  #     qualified_arn,
+  #     version,
+  #     qualified_invoke_arn,
+  #   ]
+  # }
 }
 
 data "aws_iam_policy_document" "vpc_access_permissions" {
@@ -175,9 +137,9 @@ resource "aws_lambda_alias" "this" {
   function_name    = aws_lambda_function.this.function_name
   function_version = aws_lambda_function.this.version
 
-  lifecycle {
-    ignore_changes = [function_version]
-  }
+  # lifecycle {
+  #   ignore_changes = [function_version]
+  # }
 }
 
 resource "aws_cloudwatch_log_group" "this" {
@@ -425,22 +387,19 @@ resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
 /*
 * == SSM Parameters for the Deployment Pipeline
  */
-locals {
-  ssm_parameters = {
-    compute_target       = "lambda"
-    lambda_function_name = local.function_name
-    # deployment pipeline module in all accounts create a service folder with suffix deployment-delivery-pipeline-artifacts
-    lambda_s3_bucket      = var.s3_service_account_id != null ? local.service_account_deployment_artifacts : (var.artifact != null ? var.artifact.store : null)
-    lambda_ecr_image_base = var.ecr_repository_url
+resource "aws_ssm_parameter" "lambda_version" {
+  name = "/__deployment__/${var.github_repository_name}/${var.service_directory}/lamba_version"
+  type = "String"
+
+  value = "latest"
+
+  lifecycle {
+    ignore_changes = [value]
   }
 }
 
-resource "aws_ssm_parameter" "ssm_parameters" {
-  for_each = {
-    for k, v in local.ssm_parameters : k => v if v != null
-  }
+data "aws_ssm_parameter" "deployment_version" {
+  name = "/__deployment__/${var.github_repository_name}/${var.service_directory}/lamba_version"
 
-  name  = "/__deployment__/applications/${local.function_name}/${each.key}"
-  type  = "String"
-  value = each.value
+  depends_on = [aws_ssm_parameter.lambda_version]
 }
