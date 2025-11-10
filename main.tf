@@ -90,15 +90,6 @@ resource "aws_lambda_function" "this" {
   environment {
     variables = var.enable_datadog ? merge(var.environment_variables, local.environment_variables.common, local.environment_variables.runtime) : var.environment_variables
   }
-
-  # lifecycle {
-  #   # Pipeline handles this
-  #   ignore_changes = [
-  #     qualified_arn,
-  #     version,
-  #     qualified_invoke_arn,
-  #   ]
-  # }
 }
 
 data "aws_iam_policy_document" "vpc_access_permissions" {
@@ -136,10 +127,6 @@ resource "aws_lambda_alias" "this" {
 
   function_name    = aws_lambda_function.this.function_name
   function_version = aws_lambda_function.this.version
-
-  # lifecycle {
-  #   ignore_changes = [function_version]
-  # }
 }
 
 resource "aws_cloudwatch_log_group" "this" {
@@ -382,7 +369,6 @@ resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
     }
   }
 }
-
 
 /*
 * == SSM Parameters for the Deployment Pipeline

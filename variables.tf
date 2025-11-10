@@ -55,6 +55,22 @@ variable "service_account_id" {
   default = null
 }
 
+variable "publish" {
+  description = "Publish the Lambda function version"
+  type        = bool
+  default     = true
+}
+
+variable "github_repository_name" {
+  description = "The name of the GitHub repository where the source code is hosted"
+  type        = string
+}
+
+variable "service_directory" {
+  description = "The directory where the service code is located"
+  type        = string
+  default     = "base"
+}
 
 variable "architecture" {
   description = "Architecture the lambda is compatible with. Valid values are \"x86_64\" or \"arm64\""
@@ -265,21 +281,4 @@ variable "team_name_override" {
   description = "Override the team name tag for Datadog. If set, this will override the value from the SSM parameter."
   type        = string
   default     = null
-}
-
-variable "publish" {
-  description = "Publish the Lambda function version"
-  type        = bool
-  default     = true
-}
-
-variable "github_repository_name" {
-  description = "The name of the GitHub repository where the source code is hosted"
-  type        = string
-}
-
-variable "service_directory" {
-  description = "The directory where the service code is located"
-  type        = string
-  default     = "base"
 }
