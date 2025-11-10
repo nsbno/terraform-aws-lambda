@@ -2,10 +2,6 @@ locals {
   application_name = "user-service"
 }
 
-data "vy_artifact_version" "this" {
-  application = "user-service"
-}
-
 # Remember to add: https://github.com/nsbno/terraform-datadog-provider-setup
 
 module "datadog_service" {
@@ -26,8 +22,11 @@ module "lambda" {
   enable_datadog = true
   service_name   = module.datadog_service.service_name
 
-  artifact_type = "s3"
-  artifact      = data.vy_artifact_version.this
+  artifact_type          = "s3"
+  service_account_id     = "471635792310"
+  github_repository_name = "infrademo-demo-app"
+  # Last part of the path to the lambda function, e.g., "user-service" for "services/user-service". For monorepos
+  # service_directory      = "user-service"
 
   runtime = "python3.12"
   handler = "handler.main"
