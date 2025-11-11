@@ -2,7 +2,7 @@ locals {
   function_name                        = var.component_name != null ? "${var.service_name}-${var.component_name}" : var.service_name
   log_group_name                       = var.log_group_name != null ? "/aws/lambda/${var.log_group_name}" : "/aws/lambda/${local.function_name}"
   service_account_deployment_artifacts = var.service_account_id != null ? "${var.service_account_id}-deployment-delivery-pipeline-artifacts" : null
-  working_directory                     = basename(var.working_directory)
+  working_directory                    = basename(var.working_directory)
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -375,8 +375,9 @@ resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
 * == SSM Parameters for the Deployment Pipeline
  */
 resource "aws_ssm_parameter" "lambda_version" {
-  name = "/__deployment__/${var.github_repository_name}/${local.working_directory}/lambda_version"
-  type = "String"
+  name      = "/__deployment__/${var.github_repository_name}/${local.working_directory}/lambda_version"
+  type      = "String"
+  overwrite = true
 
   value = "latest"
 
