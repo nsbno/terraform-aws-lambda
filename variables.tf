@@ -28,6 +28,11 @@ variable "ecr_repository_url" {
   type        = string
 
   default = null
+
+  validation {
+    condition     = var.artifact_type != "ecr" || var.ecr_repository_url != null
+    error_message = "When artifact_type is 'ecr', you must provide a non-null 'ecr_repository_url'."
+  }
 }
 
 variable "artifact_type" {
@@ -53,6 +58,11 @@ variable "service_account_id" {
 
   type    = string
   default = null
+
+  validation {
+    condition     = var.artifact_type != "s3" || var.service_account_id != null
+    error_message = "When artifact_type is 's3', you must provide a non-null 'service_account_id'."
+  }
 }
 
 variable "publish" {
@@ -62,12 +72,12 @@ variable "publish" {
 }
 
 variable "github_repository_name" {
-  description = "The name of the GitHub repository where the source code is hosted"
+  description = "The name of the GitHub repository where the source code is hosted. Used for deployment versioning."
   type        = string
 }
 
-variable "service_directory" {
-  description = "The directory where the service code is located"
+variable "working_directory" {
+  description = "For monorepos. Where the Lambda code is stored, from the root of repo, e.g 'services/user-service'"
   type        = string
   default     = "base"
 }

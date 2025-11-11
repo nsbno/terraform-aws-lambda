@@ -2,6 +2,7 @@ locals {
   function_name                        = var.component_name != null ? "${var.service_name}-${var.component_name}" : var.service_name
   log_group_name                       = var.log_group_name != null ? "/aws/lambda/${var.log_group_name}" : "/aws/lambda/${local.function_name}"
   service_account_deployment_artifacts = var.service_account_id != null ? "${var.service_account_id}-deployment-delivery-pipeline-artifacts" : null
+  working_directory                     = basename(var.working_directory)
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -29,8 +30,8 @@ resource "aws_lambda_function" "this" {
 
   package_type = var.artifact_type == "s3" ? "Zip" : "Image"
 
-  s3_bucket = var.artifact_type == "s3" ? (var.service_account_id != null ? local.service_account_deployment_artifacts : null) : null
-  s3_key    = var.artifact_type == "s3" ? "${var.github_repository_name}/${var.service_directory}/${data.aws_ssm_parameter.deployment_version.value}.${var.file_extension}" : null
+  s3_bucket = var.artifact_type == "s3" ? local.service_account_deployment_artifacts : null
+  s3_key    = var.artifact_type == "s3" ? "${var.github_repository_name}/${local.working_directory}/${data.aws_ssm_parameter.deployment_version.value}.${var.file_extension}" : null
   image_uri = var.artifact_type == "ecr" ? "${var.ecr_repository_url}:${data.aws_ssm_parameter.deployment_version.value}" : null
 
   timeout = var.timeout
@@ -374,7 +375,7 @@ resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
 * == SSM Parameters for the Deployment Pipeline
  */
 resource "aws_ssm_parameter" "lambda_version" {
-  name = "/__deployment__/${var.github_repository_name}/${var.service_directory}/lambda_version"
+  name = "/__deployment__/${var.github_repository_name}/${local.working_directory}/lambda_version"
   type = "String"
 
   value = "latest"
@@ -385,7 +386,7 @@ resource "aws_ssm_parameter" "lambda_version" {
 }
 
 data "aws_ssm_parameter" "deployment_version" {
-  name = "/__deployment__/${var.github_repository_name}/${var.service_directory}/lambda_version"
+  name = "/__deployment__/${var.github_repository_name}/${local.working_directory}/lambda_version"
 
   depends_on = [aws_ssm_parameter.lambda_version]
 }
