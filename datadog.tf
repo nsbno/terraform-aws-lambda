@@ -102,7 +102,7 @@ locals {
   datadog_lambda_layer_version = lookup(local.runtime_base_layer_version_map, local.runtime_base, "")
 
   datadog_account_id      = "464622532012"
-  datadog_layer_name_base = "arn:aws:lambda:${data.aws_region.current.name}:${local.datadog_account_id}:layer"
+  datadog_layer_name_base = "arn:aws:lambda:${data.aws_region.current.region}:${local.datadog_account_id}:layer"
   datadog_layer_suffix    = lookup(local.architecture_layer_suffix_map, var.architecture)
 
   team_name_tag = var.team_name_override != null ? format("team:%s", var.team_name_override) : (var.enable_datadog && length(data.aws_ssm_parameter.team_name) > 0 ? format("team:%s", data.aws_ssm_parameter.team_name[0].value) : null)
