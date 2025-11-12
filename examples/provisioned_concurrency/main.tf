@@ -6,8 +6,9 @@ module "lambda" {
   artifact_type          = "s3"
   service_account_id     = "471635792310"
   github_repository_name = "infrademo-demo-app"
-  # Last part of the path to the lambda function, e.g., "user-service" for "services/user-service". For monorepos
-  # service_directory      = "user-service"
+
+  # Used for monorepos. The directory where the Lambda function code is relative to root, e.g. "services/user-service".
+  # working_directory      = "services/user-service"
 
   runtime = "python3.11"
   handler = "handler.main"
