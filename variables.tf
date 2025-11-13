@@ -23,63 +23,21 @@ variable "description" {
   default     = null
 }
 
-variable "ecr_repository_url" {
-  description = "Repository url for the ECR image"
-  type        = string
-
-  default = null
-
-  validation {
-    condition     = var.artifact_type != "ecr" || var.ecr_repository_url != null
-    error_message = "When artifact_type is 'ecr', you must provide a non-null 'ecr_repository_url'."
-  }
-}
-
-variable "artifact_type" {
-  description = "The type of artifact to deploy"
-
-  type = string
-
-  validation {
-    condition     = contains(["s3", "ecr"], var.artifact_type)
-    error_message = "Artifact type must be one of `s3` or `ecr`."
-  }
-}
-
-variable "file_extension" {
-  description = "The file extension of the artifact (for zip artifact)"
-
-  type    = string
-  default = "zip"
-}
-
-variable "service_account_id" {
-  description = "The AWS account ID where the service is built to (for zip artifact)"
-
-  type    = string
-  default = null
-
-  validation {
-    condition     = var.artifact_type != "s3" || var.service_account_id != null
-    error_message = "When artifact_type is 's3', you must provide a non-null 'service_account_id'."
-  }
-}
-
 variable "publish" {
   description = "Publish the Lambda function version"
   type        = bool
   default     = true
 }
 
-variable "github_repository_name" {
-  description = "The name of the GitHub repository where the source code is hosted. Used for deployment versioning."
-  type        = string
-}
-
-variable "working_directory" {
-  description = "For monorepos. Where the Lambda code is stored, from the root of repo, e.g 'services/user-service'"
-  type        = string
-  default     = "base"
+variable "artifact" {
+  description = "The Lambda artifact to deploy."
+  type = object({
+    lambda_version = string
+    type           = string
+    s3_bucket      = optional(string)
+    s3_key         = optional(string)
+    ecr_image_uri  = optional(string)
+  })
 }
 
 variable "architecture" {

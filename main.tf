@@ -1,8 +1,6 @@
 locals {
-  function_name                        = var.component_name != null ? "${var.service_name}-${var.component_name}" : var.service_name
-  log_group_name                       = var.log_group_name != null ? "/aws/lambda/${var.log_group_name}" : "/aws/lambda/${local.function_name}"
-  service_account_deployment_artifacts = var.service_account_id != null ? "${var.service_account_id}-deployment-delivery-pipeline-artifacts" : null
-  working_directory                    = basename(var.working_directory)
+  function_name  = var.component_name != null ? "${var.service_name}-${var.component_name}" : var.service_name
+  log_group_name = var.log_group_name != null ? "/aws/lambda/${var.log_group_name}" : "/aws/lambda/${local.function_name}"
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -28,18 +26,18 @@ resource "aws_lambda_function" "this" {
   function_name = local.function_name
   description   = var.description
 
-  package_type = var.artifact_type == "s3" ? "Zip" : "Image"
+  package_type = var.artifact.type == "s3" ? "Zip" : "Image"
 
-  s3_bucket = var.artifact_type == "s3" ? local.service_account_deployment_artifacts : null
-  s3_key    = var.artifact_type == "s3" ? "${var.github_repository_name}/${local.working_directory}/${data.aws_ssm_parameter.deployment_version.value}.${var.file_extension}" : null
-  image_uri = var.artifact_type == "ecr" ? "${var.ecr_repository_url}:${data.aws_ssm_parameter.deployment_version.value}" : null
+  s3_bucket = var.artifact.s3_bucket
+  s3_key    = var.artifact.s3_key
+  image_uri = var.artifact.ecr_image_uri
 
   timeout = var.timeout
 
-  runtime = var.artifact_type == "s3" ? var.runtime : null
-  handler = var.artifact_type == "ecr" ? null : (
+  runtime = var.artifact.type == "s3" ? var.runtime : null
+  handler = var.artifact.type == "s3" ? (
     var.enable_datadog ? local.handler : var.handler
-  )
+  ) : null
 
   architectures = [var.architecture]
 
@@ -47,7 +45,7 @@ resource "aws_lambda_function" "this" {
 
   role = aws_iam_role.this.arn
 
-  layers = var.artifact_type == "ecr" ? null : (
+  layers = var.artifact.type == "ecr" ? null : (
     var.enable_insights ? concat(
       local.lambda_layers,
       ["arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension:33"]
@@ -81,7 +79,7 @@ resource "aws_lambda_function" "this" {
   }
 
   dynamic "image_config" {
-    for_each = var.artifact_type == "ecr" && var.enable_datadog ? [{}] : []
+    for_each = var.artifact.type == "ecr" && var.enable_datadog ? [{}] : []
 
     content {
       command = [local.handler]
@@ -369,25 +367,4 @@ resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
       level = "$.level"
     }
   }
-}
-
-/*
-* == SSM Parameters for the Deployment Pipeline
- */
-resource "aws_ssm_parameter" "lambda_version" {
-  name      = "/__deployment__/${var.github_repository_name}/${local.working_directory}/lambda_version"
-  type      = "String"
-  overwrite = true
-
-  value = "latest"
-
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
-
-data "aws_ssm_parameter" "deployment_version" {
-  name = "/__deployment__/${var.github_repository_name}/${local.working_directory}/lambda_version"
-
-  depends_on = [aws_ssm_parameter.lambda_version]
 }
