@@ -29,15 +29,62 @@ variable "publish" {
   default     = true
 }
 
+variable "artifact_type" {
+  description = "Where the artifact to deploy is stored. Valid values are 's3' or 'ecr'"
+
+  type = string
+
+  validation {
+    condition     = contains(["s3", "ecr"], var.artifact_type)
+    error_message = "Artifact type must be one of 's3' or 'ecr'."
+  }
+}
+
 variable "artifact" {
   description = "The Lambda artifact to deploy."
   type = object({
-    lambda_version = string
-    type           = string
-    s3_bucket      = optional(string)
-    s3_key         = optional(string)
-    ecr_image_uri  = optional(string)
+    git_sha = string # S3 file name
+    store   = string # S3 bucket name
+    path    = string # S3 object key
+    version = string # S3 object version
   })
+
+  default = null
+
+  validation {
+    condition = var.artifact_type == "s3" ? (
+      var.artifact != null &&
+      var.artifact.store != "" &&
+      var.artifact.path != "" &&
+      var.artifact.version != "" &&
+      var.artifact.git_sha != ""
+    ) : true
+    error_message = "When artifact_type is 's3', artifact must be provided with a valid `vy_s3_artifact` data source"
+  }
+}
+
+variable "image" {
+  description = "Whether to deploy a container image or a zip file"
+
+  type = object({
+    git_sha = string # Image tag
+    store   = string # ECR Repository URI
+    path    = string # ECR Repository name
+    uri     = string # Full ECR image URI
+    version = string # Image digest
+  })
+
+  default = null
+
+  validation {
+    condition = var.artifact_type == "ecr" ? (
+      var.image != null &&
+      var.image.store != "" &&
+      var.image.path != "" &&
+      var.image.git_sha != ""
+    ) : true
+    error_message = "When artifact_type is 'ecr', image must be provided with a valid `vy_ecr_image` data source"
+  }
 }
 
 variable "architecture" {

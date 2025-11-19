@@ -26,16 +26,18 @@ resource "aws_lambda_function" "this" {
   function_name = local.function_name
   description   = var.description
 
-  package_type = var.artifact.type == "s3" ? "Zip" : "Image"
+  package_type = var.artifact_type == "s3" ? "Zip" : "Image"
 
-  s3_bucket = var.artifact.s3_bucket
-  s3_key    = var.artifact.s3_key
-  image_uri = var.artifact.ecr_image_uri
+  s3_bucket         = var.artifact_type == "s3" ? var.artifact.store : null
+  s3_key            = var.artifact_type == "s3" ? var.artifact.path : null
+  s3_object_version = var.artifact_type == "s3" ? var.artifact.version : null
+
+  image_uri = var.artifact_type == "ecr" ? "${var.image.store}/${var.image.path}:${var.image.git_sha}" : null
 
   timeout = var.timeout
 
-  runtime = var.artifact.type == "s3" ? var.runtime : null
-  handler = var.artifact.type == "s3" ? (
+  runtime = var.artifact_type == "s3" ? var.runtime : null
+  handler = var.artifact_type == "s3" ? (
     var.enable_datadog ? local.handler : var.handler
   ) : null
 
@@ -45,7 +47,7 @@ resource "aws_lambda_function" "this" {
 
   role = aws_iam_role.this.arn
 
-  layers = var.artifact.type == "ecr" ? null : (
+  layers = var.artifact_type == "ecr" ? null : (
     var.enable_insights ? concat(
       local.lambda_layers,
       ["arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension:33"]
@@ -79,7 +81,7 @@ resource "aws_lambda_function" "this" {
   }
 
   dynamic "image_config" {
-    for_each = var.artifact.type == "ecr" && var.enable_datadog ? [{}] : []
+    for_each = var.artifact_type == "ecr" && var.enable_datadog ? [{}] : []
 
     content {
       command = [local.handler]
