@@ -222,10 +222,24 @@ variable "datadog_python_layer_version" {
   default     = 117
 }
 
-variable "datadog_profiling_enabled" {
-  description = "Enable Datadog profiling"
-  type        = bool
-  default     = false
+variable "datadog_options" {
+  description = "Additional Datadog configuration options"
+  type = object({
+    profiling_enabled       = optional(bool)
+    trace_enabled           = optional(bool)
+    logs_injection          = optional(bool)
+    merge_xray_traces       = optional(bool)
+    serverless_logs_enabled = optional(bool)
+    capture_lambda_payload  = optional(bool)
+  })
+  default = {
+    profiling_enabled       = false
+    trace_enabled           = false
+    logs_injection          = true
+    merge_xray_traces       = false
+    serverless_logs_enabled = true
+    capture_lambda_payload  = false
+  }
 }
 
 variable "datadog_api_key_secret_arn" {
