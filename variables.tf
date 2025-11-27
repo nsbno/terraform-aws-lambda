@@ -234,7 +234,7 @@ variable "datadog_options" {
   })
   default = {
     profiling_enabled       = false
-    trace_enabled           = false
+    trace_enabled           = true
     logs_injection          = true
     merge_xray_traces       = false
     serverless_logs_enabled = true
