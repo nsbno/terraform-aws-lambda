@@ -201,25 +201,25 @@ variable "custom_datadog_tags" {
 variable "datadog_extension_layer_version" {
   description = "Version for the Datadog Extension Layer"
   type        = number
-  default     = 78
+  default     = 89
 }
 
 variable "datadog_java_layer_version" {
   description = "Version for the Datadog Java Layer"
   type        = number
-  default     = 21
+  default     = 24
 }
 
 variable "datadog_node_layer_version" {
   description = "Version for the Datadog Node Layer"
   type        = number
-  default     = 124
+  default     = 130
 }
 
 variable "datadog_python_layer_version" {
   description = "Version for the Datadog Python Layer"
   type        = number
-  default     = 109
+  default     = 117
 }
 
 variable "datadog_profiling_enabled" {
