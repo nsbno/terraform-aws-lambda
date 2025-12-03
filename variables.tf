@@ -43,47 +43,15 @@ variable "artifact_type" {
 variable "artifact" {
   description = "The Lambda artifact to deploy."
   type = object({
-    git_sha = string # S3 file name
-    store   = string # S3 bucket name
-    path    = string # S3 object key
-    version = string # S3 object version
+    id                 = string           # github-repository-name/working-directory (if any)
+    git_sha            = string           # S3 file name
+    bucket_name        = optional(string) # S3 bucket name
+    ecr_repository_uri = optional(string) # ECR Repository URI
   })
 
-  default = null
-
   validation {
-    condition = var.artifact_type == "s3" ? (
-      var.artifact != null &&
-      var.artifact.store != "" &&
-      var.artifact.path != "" &&
-      var.artifact.version != "" &&
-      var.artifact.git_sha != ""
-    ) : true
-    error_message = "When artifact_type is 's3', artifact must be provided with a valid `vy_s3_artifact` data source"
-  }
-}
-
-variable "image" {
-  description = "Whether to deploy a container image or a zip file"
-
-  type = object({
-    git_sha = string # Image tag
-    store   = string # ECR Repository URI
-    path    = string # ECR Repository name
-    uri     = string # Full ECR image URI
-    version = string # Image digest
-  })
-
-  default = null
-
-  validation {
-    condition = var.artifact_type == "ecr" ? (
-      var.image != null &&
-      var.image.store != "" &&
-      var.image.path != "" &&
-      var.image.git_sha != ""
-    ) : true
-    error_message = "When artifact_type is 'ecr', image must be provided with a valid `vy_ecr_image` data source"
+    condition     = var.artifact != null
+    error_message = "A valid `vy_lambda_artifact` data source must be provided"
   }
 }
 

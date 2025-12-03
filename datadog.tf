@@ -133,8 +133,8 @@ locals {
       DD_SITE                                           = "datadoghq.eu"
       DD_TRACE_ENABLED                                  = "true"
       DD_TAGS                                           = local.combined_tags
-      DD_VERSION                                        = var.artifact_type == "s3" ? var.artifact.git_sha : var.image.git_sha
-      DD_GIT_COMMIT_SHA                                 = var.artifact_type == "s3" ? var.artifact.git_sha : var.image.git_sha
+      DD_VERSION                                        = var.artifact.git_sha
+      DD_GIT_COMMIT_SHA                                 = var.artifact.git_sha
       DD_TRACE_REMOVE_INTEGRATION_SERVICE_NAMES_ENABLED = "true"
       DD_TRACE_OTEL_ENABLED                             = "false"
       DD_SERVERLESS_APPSEC_ENABLED                      = "false"
