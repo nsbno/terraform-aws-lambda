@@ -44,6 +44,7 @@ variable "artifact" {
   description = "The Lambda artifact to deploy."
   type = object({
     git_sha            = string           # S3 file name
+    bucket_name        = optional(string) # S3 bucket name
     s3_key             = optional(string) # S3 file key prefix (infrademo-service/1234567890abcdef.zip)
     s3_object_version  = optional(string) # S3 object version
     ecr_repository_uri = optional(string) # ECR Repository URI
