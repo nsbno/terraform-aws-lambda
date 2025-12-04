@@ -223,7 +223,7 @@ variable "custom_datadog_tags" {
 variable "datadog_extension_layer_version" {
   description = "Version for the Datadog Extension Layer"
   type        = number
-  default     = 84
+  default     = 89
 }
 
 variable "datadog_java_layer_version" {
@@ -235,19 +235,33 @@ variable "datadog_java_layer_version" {
 variable "datadog_node_layer_version" {
   description = "Version for the Datadog Node Layer"
   type        = number
-  default     = 127
+  default     = 130
 }
 
 variable "datadog_python_layer_version" {
   description = "Version for the Datadog Python Layer"
   type        = number
-  default     = 113
+  default     = 117
 }
 
-variable "datadog_profiling_enabled" {
-  description = "Enable Datadog profiling"
-  type        = bool
-  default     = false
+variable "datadog_options" {
+  description = "Additional Datadog configuration options"
+  type = object({
+    profiling_enabled       = optional(bool)
+    trace_enabled           = optional(bool)
+    logs_injection          = optional(bool)
+    merge_xray_traces       = optional(bool)
+    serverless_logs_enabled = optional(bool)
+    capture_lambda_payload  = optional(bool)
+  })
+  default = {
+    profiling_enabled       = false
+    trace_enabled           = true
+    logs_injection          = true
+    merge_xray_traces       = false
+    serverless_logs_enabled = true
+    capture_lambda_payload  = false
+  }
 }
 
 variable "datadog_api_key_secret_arn" {
