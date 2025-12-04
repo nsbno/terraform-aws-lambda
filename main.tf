@@ -29,7 +29,7 @@ resource "aws_lambda_function" "this" {
   package_type = var.artifact_type == "s3" ? "Zip" : "Image"
 
   s3_bucket         = var.artifact_type == "s3" ? var.artifact.s3_bucket_name : null
-  s3_key            = var.artifact_type == "s3" ? var.artifact.s3_key : null
+  s3_key            = var.artifact_type == "s3" ? var.artifact.s3_object_path : null
   s3_object_version = var.artifact_type == "s3" ? var.artifact.s3_object_version : null
 
   image_uri = var.artifact_type == "ecr" ? "${var.artifact.ecr_repository_uri}:${var.artifact.git_sha}" : null
