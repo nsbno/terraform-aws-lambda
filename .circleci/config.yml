@@ -13,6 +13,10 @@ terraform_folders: &terraform_folders
   - ./modules/api_gw_v2_integration
   - ./examples/sqs
   - ./examples/provisioned_concurrency
+  - ./examples/complete
+  - ./examples/datadog
+  - ./examples/legacy
+  - ./examples/monorepo
 
 workflows:
   validate:

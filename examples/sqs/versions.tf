@@ -2,7 +2,8 @@ terraform {
   required_providers {
     vy = {
       source  = "nsbno/vy"
-      version = "0.3.1"
+      version = ">= 1.0.0, <2.0.0"
+      # Check for the newest version here: https://registry.terraform.io/providers/nsbno/vy/latest
     }
   }
 }

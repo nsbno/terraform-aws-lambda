@@ -2,11 +2,12 @@ terraform {
   required_providers {
     vy = {
       source  = "nsbno/vy"
-      version = "0.3.1"
+      version = ">= 1.0.0, <2.0.0"
+      # Check for the newest version here: https://registry.terraform.io/providers/nsbno/vy/latest
     }
     datadog = {
       source  = "DataDog/datadog"
-      version = ">= 3.57.0"
+      version = ">= 3.81.0"
       # Check for the newest version here: https://registry.terraform.io/providers/DataDog/datadog/latest
     }
   }
@@ -19,7 +20,7 @@ provider "vy" {
 # DATADOG SETUP
 module "datadog_provider_setup" {
   # Find newest version here: https://github.com/nsbno/terraform-datadog-provider-setup/releases
-  source = "github.com/nsbno/terraform-datadog-provider-setup?ref=x.y.z"
+  source = "github.com/nsbno/terraform-datadog-provider-setup?ref=0.0.2"
 }
 
 provider "datadog" {
