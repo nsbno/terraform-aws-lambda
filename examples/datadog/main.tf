@@ -2,8 +2,6 @@ locals {
   service_name = "user-service"
 }
 
-# Remember to add: https://github.com/nsbno/terraform-datadog-provider-setup
-
 module "datadog_service" {
   # Find newest version here: https://github.com/nsbno/terraform-datadog-service/releases
   source = "github.com/nsbno/terraform-datadog-service?ref=0.1.0"
@@ -17,10 +15,8 @@ module "datadog_service" {
 }
 
 data "vy_lambda_artifact" "user_service" {
-  github_repository_name = "terraform-aws-lambda"
-
-  # Used for monorepos. The directory where the Lambda function code is relative to root, e.g. "services/user-service".
-  # working_directory      = "services/user-service"
+  # Replace with your service GitHub repository name
+  github_repository_name = "infrademo-demo-app"
 }
 
 module "lambda" {

@@ -2,7 +2,8 @@
 # https://github.com/nsbno/platform-actions
 
 data "vy_lambda_artifact" "ecr_user_service" {
-  github_repository_name = "terraform-aws-lambda"
+  # Replace with your service GitHub repository name
+  github_repository_name = "infrademo-demo-app"
 
   # The ECR Repository name where the Lambda image is pushed.
   ecr_repository_name = "user-service-repo"

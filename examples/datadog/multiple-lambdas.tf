@@ -16,7 +16,7 @@ module "datadog_service_multiple_example" {
 }
 
 data "vy_lambda_artifact" "user_service_multiple_example" {
-  github_repository_name = "terraform-aws-lambda"
+  github_repository_name = "infrademo-demo-app"
 
   # Used for monorepos. The directory where the Lambda function code is relative to root, e.g. "services/user-service".
   # working_directory      = "services/user-service"

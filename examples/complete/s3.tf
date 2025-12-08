@@ -2,7 +2,8 @@
 # https://github.com/nsbno/platform-actions
 
 data "vy_lambda_artifact" "user_service" {
-  github_repository_name = "terraform-aws-lambda"
+  # Replace with your service GitHub repository name
+  github_repository_name = "infrademo-demo-app"
 }
 
 module "s3_lambda" {

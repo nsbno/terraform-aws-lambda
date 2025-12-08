@@ -2,8 +2,10 @@
 # https://github.com/nsbno/platform-actions
 
 data "vy_lambda_artifact" "user_service" {
-  github_repository_name = "terraform-aws-lambda"
-  working_directory      = "services/user-service"
+  # Replace with your service GitHub repository name
+  github_repository_name = "infrademo-demo-app"
+  # Used for monorepos. The directory where the Lambda function code is relative to root, e.g. "services/user-service".
+  working_directory = "services/user-service"
 }
 
 module "user_service_lambda" {
@@ -21,8 +23,10 @@ module "user_service_lambda" {
 }
 
 data "vy_lambda_artifact" "order_service" {
-  github_repository_name = "terraform-aws-lambda"
-  working_directory      = "services/order-service"
+  # Replace with your service GitHub repository name
+  github_repository_name = "infrademo-demo-app"
+  # Used for monorepos. The directory where the Lambda function code is relative to root, e.g. "services/user-service".
+  working_directory = "services/order-service"
 }
 
 module "order_service_lambda" {

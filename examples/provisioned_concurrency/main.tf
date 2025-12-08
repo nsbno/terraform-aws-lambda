@@ -1,8 +1,6 @@
 data "vy_lambda_artifact" "user_service" {
-  github_repository_name = "terraform-aws-lambda"
-
-  # Used for monorepos. The directory where the Lambda function code is relative to root, e.g. "services/user-service".
-  # working_directory      = "services/user-service"
+  # Replace with your service GitHub repository name
+  github_repository_name = "infrademo-demo-app"
 }
 
 module "lambda" {

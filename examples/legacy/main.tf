@@ -4,6 +4,7 @@ data "vy_artifact_version" "user_service" {
 }
 
 module "lambda" {
+  # IMPORTANT: If using terraform-aws-lambda (this module) < 2.0.0
   source = "../../"
 
   service_name  = "user-service"
