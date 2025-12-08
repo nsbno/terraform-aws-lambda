@@ -5,7 +5,7 @@ orbs:
 
 terraform_versions: &terraform_versions
   - 1.3.10
-  - 1.7.5
+  - 1.13.4
 
 terraform_folders: &terraform_folders
   - ./
@@ -13,6 +13,10 @@ terraform_folders: &terraform_folders
   - ./modules/api_gw_v2_integration
   - ./examples/sqs
   - ./examples/provisioned_concurrency
+  - ./examples/complete
+  - ./examples/datadog
+  - ./examples/legacy
+  - ./examples/monorepo
 
 workflows:
   validate:

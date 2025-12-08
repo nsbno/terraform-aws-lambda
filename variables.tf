@@ -23,38 +23,43 @@ variable "description" {
   default     = null
 }
 
-variable "ecr_repository_url" {
-  description = "Repository url for the ECR image"
+variable "aws_region" {
+  description = "The AWS region to deploy the Lambda function in."
   type        = string
+  default     = "eu-west-1"
+}
 
-  default = null
+variable "publish" {
+  description = "Publish the Lambda function version"
+  type        = bool
+  default     = true
 }
 
 variable "artifact_type" {
-  description = "The type of artifact to deploy"
+  description = "Where the artifact to deploy is stored. Valid values are 's3' or 'ecr'"
 
   type = string
 
   validation {
     condition     = contains(["s3", "ecr"], var.artifact_type)
-    error_message = "Artifact type must be one of `s3` or `ecr`."
+    error_message = "Artifact type must be one of 's3' or 'ecr'."
   }
 }
 
 variable "artifact" {
+  description = "The Lambda artifact to deploy."
   type = object({
-    store   = string
-    path    = string
-    version = string
+    git_sha            = string           # S3 file name
+    s3_bucket_name     = optional(string) # S3 bucket name
+    s3_object_path     = optional(string) # S3 object key (infrademo-service/1234567890abcdef.zip)
+    s3_object_version  = optional(string) # S3 object version
+    ecr_repository_uri = optional(string) # ECR Repository URI
   })
-  default = null
-}
 
-variable "s3_service_account_id" {
-  description = "The AWS account ID where the service is built to (for zip artifact)"
-
-  type    = string
-  default = null
+  validation {
+    condition     = var.artifact != null
+    error_message = "A valid `vy_lambda_artifact` data source must be provided"
+  }
 }
 
 variable "architecture" {
@@ -224,7 +229,7 @@ variable "custom_datadog_tags" {
 variable "datadog_extension_layer_version" {
   description = "Version for the Datadog Extension Layer"
   type        = number
-  default     = 84
+  default     = 89
 }
 
 variable "datadog_java_layer_version" {
@@ -236,19 +241,33 @@ variable "datadog_java_layer_version" {
 variable "datadog_node_layer_version" {
   description = "Version for the Datadog Node Layer"
   type        = number
-  default     = 127
+  default     = 130
 }
 
 variable "datadog_python_layer_version" {
   description = "Version for the Datadog Python Layer"
   type        = number
-  default     = 113
+  default     = 117
 }
 
-variable "datadog_profiling_enabled" {
-  description = "Enable Datadog profiling"
-  type        = bool
-  default     = false
+variable "datadog_options" {
+  description = "Additional Datadog configuration options"
+  type = object({
+    profiling_enabled       = optional(bool)
+    trace_enabled           = optional(bool)
+    logs_injection          = optional(bool)
+    merge_xray_traces       = optional(bool)
+    serverless_logs_enabled = optional(bool)
+    capture_lambda_payload  = optional(bool)
+  })
+  default = {
+    profiling_enabled       = false
+    trace_enabled           = true
+    logs_injection          = true
+    merge_xray_traces       = false
+    serverless_logs_enabled = true
+    capture_lambda_payload  = false
+  }
 }
 
 variable "datadog_api_key_secret_arn" {
@@ -266,10 +285,4 @@ variable "team_name_override" {
   description = "Override the team name tag for Datadog. If set, this will override the value from the SSM parameter."
   type        = string
   default     = null
-}
-
-variable "publish" {
-  description = "Publish the Lambda function version"
-  type        = bool
-  default     = false
 }

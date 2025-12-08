@@ -1,7 +1,5 @@
 data "aws_iam_account_alias" "this" {}
 
-data "aws_region" "current" {}
-
 # Team name fetched to be used for Datadog Team Tag
 data "aws_ssm_parameter" "team_name" {
   count = var.enable_datadog && var.team_name_override == null ? 1 : 0
@@ -102,7 +100,7 @@ locals {
   datadog_lambda_layer_version = lookup(local.runtime_base_layer_version_map, local.runtime_base, "")
 
   datadog_account_id      = "464622532012"
-  datadog_layer_name_base = "arn:aws:lambda:${data.aws_region.current.name}:${local.datadog_account_id}:layer"
+  datadog_layer_name_base = "arn:aws:lambda:${var.aws_region}:${local.datadog_account_id}:layer"
   datadog_layer_suffix    = lookup(local.architecture_layer_suffix_map, var.architecture)
 
   team_name_tag = var.team_name_override != null ? format("team:%s", var.team_name_override) : (var.enable_datadog && length(data.aws_ssm_parameter.team_name) > 0 ? format("team:%s", data.aws_ssm_parameter.team_name[0].value) : null)
@@ -119,22 +117,22 @@ locals {
 
   environment_variables = {
     common = {
-      DD_CAPTURE_LAMBDA_PAYLOAD                         = "false"
-      DD_LOGS_INJECTION                                 = "false"
-      DD_MERGE_XRAY_TRACES                              = "true"
-      DD_SERVERLESS_LOGS_ENABLED                        = "true"
+      DD_CAPTURE_LAMBDA_PAYLOAD                         = var.datadog_options.capture_lambda_payload
+      DD_LOGS_INJECTION                                 = var.datadog_options.logs_injection
+      DD_MERGE_XRAY_TRACES                              = var.datadog_options.merge_xray_traces
+      DD_SERVERLESS_LOGS_ENABLED                        = var.datadog_options.serverless_logs_enabled
       DD_LOGS_CONFIG_PROCESSING_RULES                   = "[{ \"type\" : \"exclude_at_match\", \"name\" :\"exclude_start_and_end_logs\", \"pattern\" : \"(START|END|REPORT) RequestId\" }]"
-      DD_PROFILING_ENABLED                              = var.datadog_profiling_enabled
+      DD_PROFILING_ENABLED                              = var.datadog_options.profiling_enabled
       DD_EXTENSION_VERSION                              = "next"
       DD_SERVICE                                        = var.service_name
       DD_ENV                                            = local.environment
       DD_SERVICE_MAPPING                                = "lambda_api_gateway:aws.apigw.${var.service_name},lambda_sns:aws.sns.${var.service_name},lambda_sqs:aws.sqs.${var.service_name},lambda_s3:aws.s3.${var.service_name},lambda_dynamodb:aws.dynamodb.${var.service_name},eventbridge.custom.event.sender:aws.eventbridge.${var.service_name},MyStream:aws.kinesis.${var.service_name}"
       DD_API_KEY_SECRET_ARN                             = var.datadog_api_key_secret_arn != null ? var.datadog_api_key_secret_arn : data.aws_secretsmanager_secret.datadog_api_key.arn
       DD_SITE                                           = "datadoghq.eu"
-      DD_TRACE_ENABLED                                  = "true"
+      DD_TRACE_ENABLED                                  = var.datadog_options.trace_enabled
       DD_TAGS                                           = local.combined_tags
-      DD_VERSION                                        = nonsensitive(data.aws_ssm_parameter.deployment_version.value)
-      DD_GIT_COMMIT_SHA                                 = nonsensitive(data.aws_ssm_parameter.deployment_version.value)
+      DD_VERSION                                        = var.artifact.git_sha
+      DD_GIT_COMMIT_SHA                                 = var.artifact.git_sha
       DD_TRACE_REMOVE_INTEGRATION_SERVICE_NAMES_ENABLED = "true"
       DD_TRACE_OTEL_ENABLED                             = "false"
       DD_SERVERLESS_APPSEC_ENABLED                      = "false"

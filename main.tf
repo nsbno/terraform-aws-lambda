@@ -1,7 +1,6 @@
 locals {
-  function_name                        = var.component_name != null ? "${var.service_name}-${var.component_name}" : var.service_name
-  log_group_name                       = var.log_group_name != null ? "/aws/lambda/${var.log_group_name}" : "/aws/lambda/${local.function_name}"
-  service_account_deployment_artifacts = var.s3_service_account_id != null ? "${var.s3_service_account_id}-deployment-delivery-pipeline-artifacts" : null
+  function_name  = var.component_name != null ? "${var.service_name}-${var.component_name}" : var.service_name
+  log_group_name = var.log_group_name != null ? "/aws/lambda/${var.log_group_name}" : "/aws/lambda/${local.function_name}"
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -23,44 +22,24 @@ resource "aws_iam_role" "this" {
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 }
 
-resource "aws_ssm_parameter" "deployment_version" {
-  # This parameter is used to initially store the version of the Lambda function. Will be overwritten
-  name  = "/__platform__/versions/${local.function_name}"
-  type  = "String"
-  value = "latest"
-
-  overwrite = true
-
-  lifecycle {
-    ignore_changes = [
-      value
-    ]
-  }
-}
-
-data "aws_ssm_parameter" "deployment_version" {
-  name = "/__platform__/versions/${local.function_name}"
-
-  depends_on = [aws_ssm_parameter.deployment_version]
-}
-
 resource "aws_lambda_function" "this" {
   function_name = local.function_name
   description   = var.description
 
   package_type = var.artifact_type == "s3" ? "Zip" : "Image"
 
-  s3_bucket         = var.artifact_type == "s3" ? (var.s3_service_account_id != null ? local.service_account_deployment_artifacts : var.artifact.store ? var.artifact.store : null) : null
-  s3_key            = var.artifact_type == "s3" ? var.artifact.path : null
-  s3_object_version = var.artifact_type == "s3" ? var.artifact.version : null
-  image_uri         = var.artifact_type == "ecr" ? "${var.ecr_repository_url}:${data.aws_ssm_parameter.deployment_version.value}" : null
+  s3_bucket         = var.artifact_type == "s3" ? var.artifact.s3_bucket_name : null
+  s3_key            = var.artifact_type == "s3" ? var.artifact.s3_object_path : null
+  s3_object_version = var.artifact_type == "s3" ? var.artifact.s3_object_version : null
+
+  image_uri = var.artifact_type == "ecr" ? "${var.artifact.ecr_repository_uri}:${var.artifact.git_sha}" : null
 
   timeout = var.timeout
 
   runtime = var.artifact_type == "s3" ? var.runtime : null
-  handler = var.artifact_type == "ecr" ? null : (
+  handler = var.artifact_type == "s3" ? (
     var.enable_datadog ? local.handler : var.handler
-  )
+  ) : null
 
   architectures = [var.architecture]
 
@@ -112,17 +91,6 @@ resource "aws_lambda_function" "this" {
   environment {
     variables = var.enable_datadog ? merge(var.environment_variables, local.environment_variables.common, local.environment_variables.runtime) : var.environment_variables
   }
-
-  lifecycle {
-    # Pipeline handles this
-    ignore_changes = [
-      qualified_arn,
-      version,
-      qualified_invoke_arn,
-      image_uri,
-      s3_object_version
-    ]
-  }
 }
 
 data "aws_iam_policy_document" "vpc_access_permissions" {
@@ -160,10 +128,6 @@ resource "aws_lambda_alias" "this" {
 
   function_name    = aws_lambda_function.this.function_name
   function_version = aws_lambda_function.this.version
-
-  lifecycle {
-    ignore_changes = [function_version]
-  }
 }
 
 resource "aws_cloudwatch_log_group" "this" {
@@ -405,28 +369,4 @@ resource "aws_cloudwatch_log_metric_filter" "lambda_log_events" {
       level = "$.level"
     }
   }
-}
-
-
-/*
-* == SSM Parameters for the Deployment Pipeline
- */
-locals {
-  ssm_parameters = {
-    compute_target       = "lambda"
-    lambda_function_name = local.function_name
-    # deployment pipeline module in all accounts create a service folder with suffix deployment-delivery-pipeline-artifacts
-    lambda_s3_bucket      = var.s3_service_account_id != null ? local.service_account_deployment_artifacts : (var.artifact != null ? var.artifact.store : null)
-    lambda_ecr_image_base = var.ecr_repository_url
-  }
-}
-
-resource "aws_ssm_parameter" "ssm_parameters" {
-  for_each = {
-    for k, v in local.ssm_parameters : k => v if v != null
-  }
-
-  name  = "/__deployment__/applications/${local.function_name}/${each.key}"
-  type  = "String"
-  value = each.value
 }

@@ -1,5 +1,6 @@
-data "vy_artifact_version" "this" {
-  application = "user-service"
+data "vy_lambda_artifact" "user_service" {
+  # Replace with your service GitHub repository name
+  github_repository_name = "infrademo-demo-app"
 }
 
 module "lambda" {
@@ -8,7 +9,7 @@ module "lambda" {
   service_name = "user-service"
 
   artifact_type = "s3"
-  artifact      = data.vy_artifact_version.this
+  artifact      = data.vy_lambda_artifact.user_service
 
   runtime = "python3.11"
   handler = "handler.main"

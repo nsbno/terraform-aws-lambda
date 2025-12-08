@@ -3,9 +3,87 @@
 :!toc-placement:
 :toc:
 
-Create serverless applications with Lambda
+Create serverless applications with Lambda.
+
+Artifacts are assumed to be handled by the
+https://github.com/nsbno/platform-actions[GitHub Actions pipeline] and
+https://registry.terraform.io/providers/nsbno/vy/latest[terraform-provider-vy].
 
 toc::[]
+
+== Usage
+
+Remember to check out the link:variables.tf[*variables*] and link:outputs.tf[*outputs*] to see all options.
+
+IMPORTANT: This module uses lambda aliases.
+Remember to use the `function_qualifier` instead of using the `function_name` to reference the lambda!
+
+=== S3 Artifact Lambda
+
+[source,hcl]
+----
+module "lambda_s3" {
+  source = "github.com/nsbno/terraform-aws-lambda?ref=x.y.z"
+
+  service_name = "get-users"
+
+  artifact_type = "s3"
+  artifact      = data.vy_lambda_artifact.this
+
+  runtime = "python3.11"
+  handler = "handler.main"
+
+  memory = 256
+}
+----
+
+See the link:examples/complete/s3.tf[full S3 artifact example here].
+
+=== ECR Artifact Lambda
+
+[source,hcl]
+----
+module "lambda_ecr" {
+  source = "github.com/nsbno/terraform-aws-lambda?ref=x.y.z"
+
+  service_name = "get-users"
+
+  artifact_type = "ecr"
+  artifact      = data.vy_lambda_artifact.this
+
+  memory = 256
+}
+----
+
+See the link:examples/complete/ecr.tf[full ECR artifact example here].
+
+== Examples
+
+These examples show you how to use this module in different configurations.
+
+=== link:examples/complete[Complete]
+
+A complete example with Vy provider, ECR and S3 artifact types.
+
+=== link:examples/monorepo/main.tf[Monorepo]
+
+Managing multiple Lambda functions in a monorepo structure.
+
+=== link:examples/datadog[Datadog]
+
+An example with Datadog integration.
+
+=== link:examples/sqs/main.tf[SQS]
+
+This example shows a Lambda that is triggered by an SQS queue.
+
+=== link:examples/provisioned_concurrency/main.tf[Provisioned concurrency]
+
+An example with autoscaling provisioned concurrency.
+
+=== link:examples/legacy/main.tf[Legacy implementation]
+
+If you are using version `< 2.0.0` of this module, check out this example.
 
 == Integration Modules
 
@@ -16,40 +94,3 @@ This module allows you to trigger your Lambda with SQS queues.
 
 link:modules/api_gw_v2_integration[API Gateway v2]::
 This module allows you to trigger your Lambda with API Gateway v2
-
-
-== Usage
-Remember to check out the link:variables.tf[*variables*] and link:outputs.tf[*outputs*] to see all options.
-
-IMPORTANT: This module uses lambda aliases. Remember to use the `function_qualifier` instead of using the `function_name` to reference the lambda!
-
-[source, hcl]
-----
-module "lambda" {
-  source = "github.com/nsbno/terraform-aws-lambda?ref=x.y.z"
-
-  name = "get-users"
-
-  artifact_type = "s3"
-  artifact      = data.vy_artifact_info.this
-
-  runtime = "python3.11"
-  handler = "handler.main"
-
-  memory = 256
-}
-----
-
-
-== Examples
-
-These examples show you how to use this module in different configurations.
-
-link:examples/sqs[SQS]::
-This example shows a Lambda that is triggered by an SQS queue.
-
-link:examples/provisioned_concurrency[Provisioned Concurrency]::
-An example with autoscaling provisioned concurrency.
-
-link:examples/datadog[Datadog]::
-An example with Datadog integration.
