@@ -50,7 +50,7 @@ resource "aws_lambda_function" "this" {
   layers = var.artifact_type == "ecr" ? null : (
     var.enable_insights ? concat(
       local.lambda_layers,
-      ["arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension:33"]
+      ["arn:aws:lambda:eu-west-1:580247275435:layer:LambdaInsightsExtension:60"]
     ) : local.lambda_layers
   )
 
