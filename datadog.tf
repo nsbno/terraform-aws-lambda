@@ -8,7 +8,6 @@ data "aws_ssm_parameter" "team_name" {
 }
 
 data "aws_secretsmanager_secret" "datadog_api_key" {
-  count = var.enable_datadog ? 1 : 0
 
   arn = var.department_override == "Digital" ? "arn:aws:secretsmanager:eu-west-1:727646359971:secret:datadog_digital_agent_api_key-4Qtp5Q" : "arn:aws:secretsmanager:eu-west-1:727646359971:secret:datadog_agent_api_key"
 }
