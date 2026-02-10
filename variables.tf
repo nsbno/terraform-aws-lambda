@@ -297,7 +297,3 @@ variable "department_override" {
     error_message = "department must be either 'digital' or 'utvikling'"
   }
 }
-  description = "Override the department for Datadog. If set, this will override the instance of Datadog that is used. Currently supports `Utvikling` (default) and `Digital`."
-  type        = string
-  default     = "Utvikling"
-}
