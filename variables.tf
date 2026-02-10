@@ -288,6 +288,15 @@ variable "team_name_override" {
 }
 
 variable "department_override" {
+  description = "Override the department for Datadog. Used to determine where observability data is sent to. Supports `utvikling` (default) and `digital`."
+   type        = string
+  default     = "utvikling"
+  
+  validation {
+    condition = var.department_override == "digital" || var.department_override == "utvikling"
+    error_message = "department must be either 'digital' or 'utvikling'"
+  }
+}
   description = "Override the department for Datadog. If set, this will override the instance of Datadog that is used. Currently supports `Utvikling` (default) and `Digital`."
   type        = string
   default     = "Utvikling"
