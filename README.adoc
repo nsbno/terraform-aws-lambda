@@ -57,6 +57,21 @@ module "lambda_ecr" {
 
 See the link:examples/complete/ecr.tf[full ECR artifact example here].
 
+=== Team Digital Usage with Datadog
+
+For Team Digital services, use this configuration to ensure logs reach the correct Datadog tenant:
+
+[source,hcl]
+----
+module "lambda" {
+  source = "github.com/nsbno/terraform-aws-lambda?ref=x.y.z"
+
+  department_override = "digital"
+  
+  # ... rest of your configuration goes here
+}
+----
+
 == Examples
 
 These examples show you how to use this module in different configurations.
