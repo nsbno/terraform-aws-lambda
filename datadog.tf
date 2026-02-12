@@ -33,7 +33,8 @@ data "aws_iam_policy_document" "secrets_manager" {
     ]
 
     resources = [
-      "arn:aws:kms:eu-west-1:727646359971:key/mrk-6b3db23cbaa4487e947f3da1a447bc92",
+      "arn:aws:kms:eu-west-1:727646359971:key/1bfdf87f-a69c-41f8-929a-2a491fc64f69",
+      "arn:aws:kms:eu-west-1:727646359971:key/mrk-6b3db23cbaa4487e947f3da1a447bc92"
     ]
   }
 }
