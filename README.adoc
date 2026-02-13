@@ -67,6 +67,7 @@ module "lambda" {
   source = "github.com/nsbno/terraform-aws-lambda?ref=x.y.z"
 
   department_override = "digital"
+  team_name_override = "dx"
   
   # ... rest of your configuration goes here
 }
