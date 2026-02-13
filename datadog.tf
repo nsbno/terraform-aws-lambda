@@ -8,8 +8,10 @@ data "aws_ssm_parameter" "team_name" {
 }
 
 data "aws_secretsmanager_secret" "datadog_api_key" {
-  arn = "arn:aws:secretsmanager:eu-west-1:727646359971:secret:datadog_agent_api_key"
+
+  arn = var.department_override == "digital" ? "arn:aws:secretsmanager:eu-west-1:727646359971:secret:datadog_digital_agent_api_key-4Qtp5Q" : "arn:aws:secretsmanager:eu-west-1:727646359971:secret:datadog_agent_api_key"
 }
+
 
 data "aws_iam_policy_document" "secrets_manager" {
   statement {
@@ -32,6 +34,7 @@ data "aws_iam_policy_document" "secrets_manager" {
 
     resources = [
       "arn:aws:kms:eu-west-1:727646359971:key/1bfdf87f-a69c-41f8-929a-2a491fc64f69",
+      "arn:aws:kms:eu-west-1:727646359971:key/mrk-6b3db23cbaa4487e947f3da1a447bc92"
     ]
   }
 }
