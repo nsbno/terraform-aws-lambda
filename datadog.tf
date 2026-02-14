@@ -79,16 +79,19 @@ locals {
     "java11"     = "dd-trace-java"
     "java17"     = "dd-trace-java"
     "java21"     = "dd-trace-java"
+    "java25"     = "dd-trace-java"
     "nodejs16.x" = "Datadog-Node16-x"
     "nodejs18.x" = "Datadog-Node18-x"
     "nodejs20.x" = "Datadog-Node20-x"
     "nodejs22.x" = "Datadog-Node22-x"
+    "nodejs24.x" = "Datadog-Node24-x"
     "python3.8"  = "Datadog-Python38"
     "python3.9"  = "Datadog-Python39"
     "python3.10" = "Datadog-Python310"
     "python3.11" = "Datadog-Python311"
     "python3.12" = "Datadog-Python312"
     "python3.13" = "Datadog-Python313"
+    "python3.14" = "Datadog-Python314"
   }
 }
 
