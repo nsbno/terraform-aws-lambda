@@ -79,6 +79,7 @@ locals {
     "java11"     = "dd-trace-java"
     "java17"     = "dd-trace-java"
     "java21"     = "dd-trace-java"
+    "java25"     = "dd-trace-java"
     "nodejs16.x" = "Datadog-Node16-x"
     "nodejs18.x" = "Datadog-Node18-x"
     "nodejs20.x" = "Datadog-Node20-x"
