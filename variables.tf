@@ -297,3 +297,10 @@ variable "department_override" {
     error_message = "department must be either 'digital' or 'utvikling'"
   }
 }
+
+
+variable "create_before_destroy" {
+  type        = bool
+  description = "Set lifecycle create_before_destroy on lambda resource"
+  default     = false
+}

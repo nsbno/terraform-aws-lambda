@@ -91,6 +91,10 @@ resource "aws_lambda_function" "this" {
   environment {
     variables = var.enable_datadog ? merge(var.environment_variables, local.environment_variables.common, local.environment_variables.runtime) : var.environment_variables
   }
+
+  lifecycle {
+    create_before_destroy = var.create_before_destroy
+  }
 }
 
 data "aws_iam_policy_document" "vpc_access_permissions" {
